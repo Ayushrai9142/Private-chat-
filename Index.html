@@ -1,28 +1,26 @@
-<!DOCTYPE html>
-<html>
+<!-- index.html --><!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ayush Chat</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <title>Chat App</title>
 </head>
 <body>
-  <h2>Ayush Private Chat</h2>
-  <div id="login-section">
+  <div class="login-screen" id="login-screen">
+    <h2>Login</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
+    <p>or</p>
     <button onclick="signup()">Sign Up</button>
-  </div>
-
-  <div id="chat-section" style="display:none;">
-    <div id="messages" style="height:200px; overflow:auto; border:1px solid #ccc;"></div>
-    <input type="text" id="message" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
-    <button onclick="logout()">Logout</button>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+  </div>  <div class="chat-screen" id="chat-screen" style="display: none;">
+    <div class="chat-header">Chat App</div>
+    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-input">
+      <input type="text" id="message-input" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>  <script src="script.js"></script></body>
 </html>
