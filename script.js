@@ -1,57 +1,63 @@
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  databaseURL: "YOUR_DATABASE_URL",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js";
 
-const auth = firebase.auth();
-const db = firebase.database();
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const loginScreen = document.getElementById("login-screen");
+const chatScreen = document.getElementById("chat-screen");
+const chatBox = document.getElementById("chat-box");
+const messageInput = document.getElementById("message-input");
 
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      document.getElementById("login-screen").style.display = "none";
-      document.getElementById("chat-screen").style.display = "block";
-    })
-    .catch(e => alert(e.message));
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => showChat())
+    .catch(alert);
 }
 
 function signup() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(() => login())
-    .catch(e => alert(e.message));
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => showChat())
+    .catch(alert);
 }
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("chat-screen").style.display = "block";
-    db.ref("messages").on("child_added", snapshot => {
-      const msg = snapshot.val();
-      const p = document.createElement("p");
-      p.innerText = msg.email + ": " + msg.text;
-      document.getElementById("chat-box").appendChild(p);
-    });
-  }
-});
+function showChat() {
+  loginScreen.style.display = "none";
+  chatScreen.style.display = "block";
+}
 
 function sendMessage() {
-  const input = document.getElementById("message-input");
-  const text = input.value.trim();
-  if (text !== "") {
-    db.ref("messages").push({
-      email: auth.currentUser.email,
-      text: text
+  const message = messageInput.value.trim();
+  if (message) {
+    const msgRef = ref(db, "messages");
+    push(msgRef, {
+      text: message,
+      time: Date.now(),
     });
-    input.value = "";
+    messageInput.value = "";
   }
 }
+
+onChildAdded(ref(db, "messages"), (snapshot) => {
+  const msg = snapshot.val();
+  const p = document.createElement("p");
+  p.innerText = msg.text;
+  chatBox.appendChild(p);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
