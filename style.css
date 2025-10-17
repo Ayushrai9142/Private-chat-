@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   background-color: #e5ddd5;
   display: flex;
   justify-content: center;
@@ -8,54 +8,49 @@ body {
   height: 100vh;
 }
 
-.login-screen {
-  width: 360px;
+.container {
+  width: 380px;
+}
+
+.login-screen, .chat-screen {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
-.chat-header {
+.login-header {
   background-color: #075e54;
   color: #fff;
   text-align: center;
   padding: 18px;
   font-size: 22px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  border-radius: 12px 12px 0 0;
 }
 
 .login-body {
+  display: flex;
+  flex-direction: column;
   padding: 30px 25px;
 }
 
-.login-body label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 6px;
-  color: #333;
-}
-
 .login-body input {
-  width: 100%;
   padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
   margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 15px;
   box-sizing: border-box;
+  transition: border 0.3s, box-shadow 0.3s;
 }
 
 .login-body input:focus {
   border-color: #075e54;
-  outline: none;
   box-shadow: 0 0 4px rgba(7,94,84,0.4);
+  outline: none;
 }
 
 .login-body button {
-  width: 100%;
   background: #075e54;
   color: white;
   border: none;
@@ -67,24 +62,76 @@ body {
 }
 
 .login-body button:hover {
-  background: #064a47;
+  background-color: #064a47;
 }
 
-.login-footer {
+.login-body .signup-btn {
+  background-color: #128c7e;
+}
+
+.login-body .signup-btn:hover {
+  background-color: #0f776d;
+}
+
+.divider {
   text-align: center;
-  padding: 15px;
   font-size: 14px;
   color: #333;
-  background: #f8f8f8;
-  border-top: 1px solid #eee;
+  margin: 10px 0;
 }
 
-.login-footer a {
-  color: #075e54;
-  text-decoration: none;
-  font-weight: 600;
+/* Chat section */
+.chat-header {
+  background-color: #075e54;
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-size: 20px;
+  border-radius: 12px 12px 0 0;
 }
 
-.login-footer a:hover {
-  text-decoration: underline;
+.chat-box {
+  height: 300px;
+  overflow-y: auto;
+  background: #f5f5f5;
+  padding: 10px;
+}
+
+.chat-box p {
+  background: #dcf8c6;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background: #ffffff;
+  border-top: 1px solid #ddd;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  font-size: 15px;
+}
+
+.chat-input button {
+  background: #075e54;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-left: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.chat-input button:hover {
+  background: #064a47;
 }
