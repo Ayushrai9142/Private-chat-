@@ -1,24 +1,24 @@
-// Show chat screen and hide login after login button click
-function login() {
-  // You can add real authentication here
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('chat-screen').style.display = 'flex';
-}
-
-// Placeholder signup button action
-function signup() {
-  alert("Sign Up clicked!");
-}
-
-// Send message to chat box and clear input
 function sendMessage() {
   const input = document.getElementById('message-input');
   const message = input.value.trim();
   if (message) {
     const chatBox = document.getElementById('chat-box');
-    const p = document.createElement('p');
-    p.textContent = message;
-    chatBox.appendChild(p);
+
+    // Append user's message
+    const userMsg = document.createElement('p');
+    userMsg.textContent = message;
+    userMsg.style.backgroundColor = '#dcf8c6';  // User message color
+    chatBox.appendChild(userMsg);
+
+    // Append automated English reply
+    const replyMsg = document.createElement('p');
+    replyMsg.textContent = "Please login to continue chatting.";
+    replyMsg.style.backgroundColor = '#f0f0f0';  // Different color for reply
+    replyMsg.style.color = '#555';
+    replyMsg.style.fontStyle = 'italic';
+    chatBox.appendChild(replyMsg);
+
+    // Clear input and scroll chat down
     input.value = '';
     chatBox.scrollTop = chatBox.scrollHeight;
   }
