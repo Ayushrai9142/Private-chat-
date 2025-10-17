@@ -2,53 +2,89 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #e5ddd5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-.login-screen, .chat-screen {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
+
+.login-screen {
+  width: 360px;
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
+
 .chat-header {
   background-color: #075e54;
   color: #fff;
-  padding: 10px;
   text-align: center;
-  font-size: 20px;
-  border-radius: 10px 10px 0 0;
+  padding: 18px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 12px 12px 0 0;
 }
-.chat-box {
-  height: 300px;
-  overflow-y: scroll;
-  background: #f0f0f0;
-  padding: 10px;
-  border-radius: 0 0 10px 10px;
+
+.login-body {
+  padding: 30px 25px;
 }
-.chat-box p {
-  background: #dcf8c6;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 5px;
-  max-width: 80%;
+
+.login-body label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
 }
-.chat-input {
-  display: flex;
-  margin-top: 10px;
-}
-.chat-input input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 5px;
+
+.login-body input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  margin-bottom: 15px;
+  font-size: 15px;
+  box-sizing: border-box;
 }
-.chat-input button {
+
+.login-body input:focus {
+  border-color: #075e54;
+  outline: none;
+  box-shadow: 0 0 4px rgba(7,94,84,0.4);
+}
+
+.login-body button {
+  width: 100%;
   background: #075e54;
   color: white;
   border: none;
-  padding: 10px;
-  margin-left: 5px;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-body button:hover {
+  background: #064a47;
+}
+
+.login-footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+  color: #333;
+  background: #f8f8f8;
+  border-top: 1px solid #eee;
+}
+
+.login-footer a {
+  color: #075e54;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
 }
