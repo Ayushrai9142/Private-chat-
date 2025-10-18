@@ -1,25 +1,34 @@
 function sendMessage() {
   const input = document.getElementById('message-input');
   const message = input.value.trim();
+
   if (message) {
     const chatBox = document.getElementById('chat-box');
 
-    // Append user's message
+    // User message (right aligned)
     const userMsg = document.createElement('p');
     userMsg.textContent = message;
-    userMsg.style.backgroundColor = '#dcf8c6';  // User message color
+    userMsg.classList.add('user-message');
     chatBox.appendChild(userMsg);
 
-    // Append automated English reply
-    const replyMsg = document.createElement('p');
-    replyMsg.textContent = "Please login to continue chatting.";
-    replyMsg.style.backgroundColor = '#f0f0f0';  // Different color for reply
-    replyMsg.style.color = '#555';
-    replyMsg.style.fontStyle = 'italic';
-    chatBox.appendChild(replyMsg);
+    // Typing indicator (left aligned)
+    const typing = document.createElement('p');
+    typing.textContent = 'typing...';
+    typing.classList.add('typing-message');
+    chatBox.appendChild(typing);
 
-    // Clear input and scroll chat down
-    input.value = '';
+    // Scroll to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
+    input.value = '';
+
+    // After 2 seconds, remove typing and show reply
+    setTimeout(() => {
+      typing.remove();
+      const replyMsg = document.createElement('p');
+      replyMsg.textContent = 'Please login to continue chatting.';
+      replyMsg.classList.add('bot-message');
+      chatBox.appendChild(replyMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 2000);
   }
 }
