@@ -1,27 +1,58 @@
 /* --- BASE RESET --- */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
-body, html { height: 100%; background: #e5ddd5; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
 
-/* --- LOGIN CONTAINER (Tumhara Pasandeeda Design) --- */
-.container {
+body, html {
+  height: 100%;
   width: 100%;
-  max-width: 500px; /* Mobile ke liye thoda adjust kiya taaki stretch na ho */
-  background: rgba(255,255,255,0.9);
-  border-radius: 24px;
-  padding: 36px 30px;
-  box-shadow: 0 8px 40px rgba(7,94,84,0.14);
-  text-align: center;
-  color: #075e54;
-  position: absolute; /* Screen ke beech me rakhne ke liye */
-  z-index: 100;
+  background: #e5ddd5; /* WhatsApp BG Color */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: hidden;
 }
 
-h2 { font-size: 2em; margin-bottom: 20px; }
+/* --- MAIN GLASS CONTAINER (Tumhara Original Design) --- */
+.container {
+  width: 100%;
+  max-width: 600px;
+  /* YEH HAI WAHI ORIGINAL GLASS EFFECT 👇 */
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 24px;
+  padding: 36px 30px;
+  box-shadow: 0 8px 40px rgba(7, 94, 84, 0.14);
+  text-align: center;
+  color: #075e54;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: 90vh; /* Mobile fit */
+}
 
-.input-group { margin-bottom: 15px; text-align: left; }
+/* --- LOGIN SCREEN --- */
+#login-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 { font-size: 2em; margin-bottom: 10px; font-weight: bold; }
+p.desc { font-size: 1em; margin-bottom: 25px; color: #444; }
+
+.input-group { margin-bottom: 20px; text-align: left; width: 100%; }
 .input-group input {
-  width: 100%; padding: 14px; border-radius: 8px;
-  border: 1px solid #ccc; outline: none; font-size: 16px;
+  width: 100%; padding: 14px 12px;
+  border-radius: 8px; border: 1px solid #ccc;
+  font-size: 1em; outline: none;
+  background: #fff; color: #333;
+}
+.input-group input:focus {
+  border-color: #075e54;
+  box-shadow: 0 0 8px rgba(7,94,84,0.3);
 }
 
 /* --- BUTTONS --- */
@@ -29,71 +60,74 @@ button {
   width: 100%; background: #25d366; border: none;
   padding: 15px; border-radius: 8px; color: #fff;
   font-size: 1.1em; cursor: pointer; margin-bottom: 12px;
-  font-weight: bold; transition: 0.3s;
+  transition: background 0.2s; font-weight: bold;
 }
 button:hover { background: #128c7e; }
 
 .signup-btn { background: #075e54; }
 .signup-btn:hover { background: #05473d; }
 
-/* --- ERROR MESSAGE (No Alert) --- */
+/* --- ERROR MESSAGE (Red Text, No Alert) --- */
 #auth-error-msg {
   color: #d32f2f; font-size: 14px; margin-top: 10px;
-  display: none; background: #ffebee; padding: 10px; border-radius: 5px;
+  display: none; background: rgba(255, 255, 255, 0.8);
+  padding: 8px; border-radius: 5px;
 }
 
 /* --- CHAT SCREEN --- */
 #chat-screen {
-  display: none; background: #fff;
-  width: 100%; height: 100%; /* Full Screen */
-  flex-direction: column; z-index: 50;
+  display: none; /* Initially Hidden */
+  background: #fff;
+  border-radius: 14px;
+  width: 100%; height: 100%;
+  flex-direction: column;
   position: absolute; top: 0; left: 0;
+  overflow: hidden;
 }
 
 .chat-header {
-  background: #075e54; color: white; padding: 15px;
-  font-size: 18px; font-weight: bold;
+  background: #075e54; color: white; padding: 14px;
+  font-size: 20px; font-weight: 600;
   display: flex; justify-content: space-between; align-items: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .header-actions button {
-  width: auto; background: rgba(255,255,255,0.2);
-  padding: 6px 12px; font-size: 12px; margin-left: 5px; margin-bottom: 0;
+  width: auto; padding: 5px 12px; font-size: 12px;
+  margin: 0 0 0 5px; background: rgba(255,255,255,0.2);
 }
 
 .chat-box {
-  flex-grow: 1; padding: 15px; background: #e5ddd5;
+  flex-grow: 1; padding: 16px; background: #e5ddd5;
   overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
 }
 
-/* --- MESSAGES --- */
+/* Messages */
 .message {
-  max-width: 80%; padding: 8px 12px; border-radius: 8px;
-  font-size: 15px; position: relative; word-wrap: break-word;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  padding: 8px 12px; border-radius: 8px;
+  max-width: 75%; word-wrap: break-word; font-size: 15px;
+  position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
-.my-message { align-self: flex-end; background: #dcf8c6; cursor: pointer; }
-.other-message { align-self: flex-start; background: #fff; }
+.my-message { background: #dcf8c6; align-self: flex-end; border-radius: 8px 0 8px 8px; cursor: pointer; }
+.other-message { background: #fff; align-self: flex-start; border-radius: 0 8px 8px 8px; }
 
 .sender-name { font-size: 11px; font-weight: bold; color: #e55e5e; margin-bottom: 2px; display: block; }
 .msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; display: block; }
 .msg-time { font-size: 10px; color: #777; display: block; text-align: right; margin-top: 3px; }
 
-/* --- INPUT AREA --- */
+/* Input Area */
 .chat-input-area {
-  display: flex; padding: 10px; background: #f0f0f0;
+  display: flex; padding: 10px 14px; background: #fff;
   border-top: 1px solid #ddd; align-items: center;
 }
 .chat-input-area input {
-  flex-grow: 1; padding: 12px; border-radius: 20px;
-  border: none; outline: none; margin: 0 10px; font-size: 15px;
+  flex-grow: 1; padding: 10px 14px; border: 1px solid #ccc;
+  border-radius: 20px; outline: none; font-size: 14px; margin: 0 8px;
 }
 .icon-btn {
   background: none; width: auto; padding: 5px; margin: 0;
   color: #555; font-size: 24px; cursor: pointer;
 }
 
-/* --- CUSTOM MODAL (Popup) --- */
+/* --- CUSTOM MODAL (Popup Box) --- */
 #custom-modal {
   display: none; position: absolute; top: 0; left: 0;
   width: 100%; height: 100%; background: rgba(0,0,0,0.5);
@@ -101,7 +135,7 @@ button:hover { background: #128c7e; }
 }
 .modal-content {
   background: white; padding: 25px; border-radius: 15px;
-  width: 85%; max-width: 320px; text-align: center;
+  width: 85%; max-width: 300px; text-align: center;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 #modal-input {
@@ -120,7 +154,6 @@ button:hover { background: #128c7e; }
   transform: translateX(-50%); font-size: 14px;
 }
 #toast-box.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-
 @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
 @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
