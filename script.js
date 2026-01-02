@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// --- TUMHARI ASLI KEYS (Direct Copy-Paste Ready) ---
+// --- YOUR CONFIG (Isme tumhari keys hain) ---
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
  authDomain: "private-chat-5c4c9.firebaseapp.com",
@@ -17,55 +17,73 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// Elements
+// DOM Elements
 const loginContainer = document.getElementById("login-container");
 const chatScreen = document.getElementById("chat-screen");
 const chatBox = document.getElementById("chat-box");
 const msgInput = document.getElementById("message-input");
 const imgInput = document.getElementById("image-input");
 
-// Buttons
-const loginBtn = document.getElementById("login-btn");
-const signupBtn = document.getElementById("signup-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const sendBtn = document.getElementById("send-msg-btn");
-const uploadBtn = document.getElementById("upload-trigger");
-const profileBtn = document.getElementById("profile-btn");
+// Modal Elements
+const modal = document.getElementById("custom-modal");
+const modalTitle = document.getElementById("modal-title");
+const modalInput = document.getElementById("modal-input");
+const modalConfirm = document.getElementById("modal-confirm");
+const modalCancel = document.getElementById("modal-cancel");
 
 let currentUser = null;
+let modalCallback = null; // Store function to run on confirm
 
-// --- Auth Functions ---
-loginBtn.addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    const pass = document.getElementById("password").value;
-    signInWithEmailAndPassword(auth, email, pass).catch(e => alert(e.message));
-});
+// --- UI Helper Functions ---
+function showModal(title, needsInput, callback) {
+    modalTitle.innerText = title;
+    modal.style.display = "flex";
+    modalCallback = callback;
 
-signupBtn.addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    const pass = document.getElementById("password").value;
-    createUserWithEmailAndPassword(auth, email, pass)
-        .then(() => alert("Account Created! Please Login."))
-        .catch(e => alert(e.message));
-});
-
-if(logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-        signOut(auth).then(() => location.reload());
-    });
+    if (needsInput) {
+        modalInput.style.display = "block";
+        modalInput.value = "";
+        modalInput.focus();
+    } else {
+        modalInput.style.display = "none";
+    }
 }
 
-// Update Name Feature
-if(profileBtn) {
-    profileBtn.addEventListener("click", () => {
-        const newName = prompt("Enter your Display Name:", currentUser.displayName || "");
-        if (newName) {
+function closeModal() {
+    modal.style.display = "none";
+    modalCallback = null;
+}
+
+modalCancel.addEventListener("click", closeModal);
+modalConfirm.addEventListener("click", () => {
+    if (modalCallback) modalCallback(modalInput.value);
+    closeModal();
+});
+
+// --- Auth Logic ---
+document.getElementById("login-btn").addEventListener("click", () => {
+    signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value)
+    .catch(e => showModal("Error: " + e.message, false, null));
+});
+
+document.getElementById("signup-btn").addEventListener("click", () => {
+    createUserWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value)
+    .then(() => showModal("Account Created! Login now.", false, null))
+    .catch(e => showModal("Error: " + e.message, false, null));
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => signOut(auth).then(() => location.reload()));
+
+// Name Change
+document.getElementById("profile-btn").addEventListener("click", () => {
+    showModal("Change Your Name", true, (newName) => {
+        if (newName && newName.trim() !== "") {
             updateProfile(currentUser, { displayName: newName }).then(() => {
-                alert("Name Updated! Next messages will show new name.");
+                // Future messages will have new name
             });
         }
     });
-}
+});
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -80,105 +98,78 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // --- Chat Logic ---
-
 function sendMessage(text = "", imageUrl = null) {
     if ((!text && !imageUrl) || !currentUser) return;
 
-    // Use displayName if available, else email prefix
-    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    // AUTO NAME LOGIC: Agar naam set nahi hai, toh email ka pehla hissa le lo
+    let displayName = currentUser.displayName;
+    if (!displayName) {
+        displayName = currentUser.email.split('@')[0];
+    }
 
     push(ref(db, "messages"), {
         text: text,
         imageUrl: imageUrl,
         sender: currentUser.email,
-        senderName: name,
+        senderName: displayName,
         timestamp: Date.now()
     });
     msgInput.value = "";
 }
 
-sendBtn.addEventListener("click", () => sendMessage(msgInput.value.trim()));
+document.getElementById("send-msg-btn").addEventListener("click", () => sendMessage(msgInput.value.trim()));
 msgInput.addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(msgInput.value.trim()); });
 
-// --- Image Upload Logic (Base64 < 100KB) ---
-if(uploadBtn) {
-    uploadBtn.addEventListener("click", () => imgInput.click());
-
-    imgInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Size Check (100KB Limit = 100 * 1024 bytes)
-        if (file.size > 100 * 1024) {
-            alert("Image too big! Please select image less than 100KB.");
-            imgInput.value = "";
-            return;
-        }
-
+// Image Upload
+document.getElementById("upload-trigger").addEventListener("click", () => imgInput.click());
+imgInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file && file.size < 100 * 1024) {
         const reader = new FileReader();
-        reader.onload = function(event) {
-            sendMessage("", event.target.result); // Send image as Base64 string
-        };
+        reader.onload = (ev) => sendMessage("", ev.target.result);
         reader.readAsDataURL(file);
-    });
-}
+    } else {
+        showModal("Image too big! Max 100KB.", false, null);
+    }
+});
 
-// --- Display & Delete Logic ---
+// --- Messages & Delete ---
 function loadMessages() {
     chatBox.innerHTML = "";
-    
-    // Message Aaya
     onChildAdded(ref(db, "messages"), (snapshot) => {
-        const msg = snapshot.val();
-        const key = snapshot.key; // Message ID for deletion
-        displayMessage(msg, key);
+        displayMessage(snapshot.val(), snapshot.key);
     });
-
-    // Message Delete Hua
     onChildRemoved(ref(db, "messages"), (snapshot) => {
-        const key = snapshot.key;
-        const msgDiv = document.getElementById(key);
-        if (msgDiv) msgDiv.remove();
+        const el = document.getElementById(snapshot.key);
+        if (el) el.remove();
     });
 }
 
 function displayMessage(data, key) {
     const div = document.createElement("div");
     div.classList.add("message");
-    div.id = key; // ID set kar rahe hain taaki delete kar sakein
+    div.id = key;
 
     const isMe = data.sender === currentUser.email;
     div.classList.add(isMe ? "my-message" : "other-message");
 
-    const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    // Content Build
-    let contentHtml = `<div class="sender-name">${data.senderName || 'User'}</div>`;
-    
-    if (data.imageUrl) {
-        contentHtml += `<img src="${data.imageUrl}" class="msg-img">`;
-    }
-    if (data.text) {
-        contentHtml += `<div>${data.text}</div>`;
-    }
-
-    contentHtml += `<div class="msg-time">${time}`;
-    
-    // Delete Button (Sirf mere message pe)
+    // Click to Delete (Only my messages)
     if (isMe) {
-        contentHtml += `<span class="delete-btn" onclick="deleteMsg('${key}')">🗑</span>`;
+        div.addEventListener("click", () => {
+            showModal("Delete this message?", false, () => {
+                remove(ref(db, "messages/" + key));
+            });
+        });
     }
-    contentHtml += `</div>`;
 
-    div.innerHTML = contentHtml;
+    const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let html = `<div class="sender-name">${data.senderName}</div>`;
+    if (data.imageUrl) html += `<img src="${data.imageUrl}" class="msg-img">`;
+    if (data.text) html += `<div>${data.text}</div>`;
+    html += `<div class="msg-time" style="font-size:9px; text-align:right; color:#777;">${time}</div>`;
+    
+    div.innerHTML = html;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-// Global function to handle delete click
-window.deleteMsg = function(key) {
-    if (confirm("Delete this message?")) {
-        remove(ref(db, "messages/" + key));
-    }
-};
 
