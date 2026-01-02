@@ -1,4 +1,4 @@
-/* --- TUMHARA ORIGINAL DESIGN CODE (START) --- */
+/* --- TUMHARA DIYA HUA BASE CSS --- */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
 
 body, html {
@@ -10,121 +10,147 @@ body, html {
   padding: 20px;
 }
 
-/* LOGIN CONTAINER - EXACT TUMHARA CODE */
+/* LOGIN CONTAINER (Exact Style) */
 .container {
   width: 100%;
   max-width: 600px;
-  background: rgba(255,255,255,0.9); /* Tumhara 0.9 wala solid bg */
+  background: rgba(255,255,255,0.9); /* Wahi milky white */
   border-radius: 24px;
   padding: 36px 30px;
+  backdrop-filter: blur(8px);
   box-shadow: 0 8px 40px rgba(7,94,84,0.14);
   text-align: center;
   color: #075e54;
-  position: relative; /* Modal ke liye zaroori */
+  /* Center positioning logic handled by body flex */
 }
 
 h2 { font-size: 2em; margin-bottom: 10px; }
+p.desc { font-size: 1em; margin-bottom: 25px; color: #444; }
 
-.input-group { margin-bottom: 20px; text-align: left; }
+.input-group { margin-bottom: 20px; text-align: left; position: relative; }
 .input-group input {
   width: 100%; padding: 14px 12px;
   border-radius: 8px; border: 1px solid #ccc;
   font-size: 1em; outline: none;
   background: #fff; color: #333;
+  transition: border-color 0.3s;
+}
+.input-group input:focus {
+  border-color: #075e54;
+  box-shadow: 0 0 8px rgba(7,94,84,0.3);
 }
 
-/* BUTTONS */
 button {
   width: 100%; background: #25d366; border: none;
   padding: 15px; border-radius: 8px; color: #fff;
   font-size: 1.1em; cursor: pointer; margin-bottom: 12px;
-  font-weight: bold; transition: background 0.2s;
+  transition: background 0.2s; font-weight: bold;
 }
 button:hover { background: #128c7e; }
 
 .signup-btn { background: #075e54; }
 .signup-btn:hover { background: #05473d; }
+.divider { margin: 15px 0; font-size: 14px; color: #666; }
 
-/* CHAT SCREEN - EXACT TUMHARA CODE */
+/* ERROR MSG (Red text instead of alert) */
+#auth-error-msg {
+  color: #d32f2f; font-size: 14px; margin-top: 10px;
+  display: none; padding: 5px; background: rgba(255,200,200,0.2); border-radius: 5px;
+}
+
+/* --- CHAT SCREEN (Exact Style) --- */
 #chat-screen {
   display: none;
   background: #fff;
   border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   width: 100%;
-  max-width: 700px;
-  height: 600px; /* Fixed height jaisa tumne diya */
+  max-width: 700px; /* Tumhara size match */
+  height: 600px;    /* Tumhara size match */
   flex-direction: column;
-  position: relative; /* Zaroori */
+  position: relative;
+}
+
+/* Mobile responsive fix taaki screen se bahar na jaye */
+@media (max-width: 768px) {
+  .container, #chat-screen {
+    width: 95vw;
+    height: 90vh; /* Mobile pe full height better hai */
+  }
 }
 
 .chat-header {
-  background: #075e54; color: white; padding: 14px;
+  background-color: #075e54; color: white;
+  padding: 14px; font-size: 20px;
   border-radius: 14px 14px 0 0;
+  font-weight: 600;
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 20px; font-weight: bold;
+}
+
+.header-actions button {
+  width: auto; padding: 6px 12px; font-size: 12px;
+  margin: 0 0 0 5px; background: rgba(255,255,255,0.2);
+  border-radius: 4px;
 }
 
 .chat-box {
-  flex-grow: 1; padding: 16px; background: #e5ddd5;
-  overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+  flex-grow: 1; padding: 16px; background: #e5ddd5; /* WhatsApp BG */
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+  display: flex; flex-direction: column; gap: 8px;
 }
 
+/* Input Area */
 .chat-input {
-  display: flex; padding: 10px; background: #f0f0f0;
-  border-radius: 0 0 14px 14px; align-items: center;
+  display: flex; padding: 10px 14px; background: #fff;
+  border-radius: 0 0 14px 14px;
+  border-top: 1px solid #ddd;
+  align-items: center;
 }
 .chat-input input {
-  flex-grow: 1; padding: 10px; border-radius: 20px;
-  border: none; outline: none; margin: 0 10px;
+  flex-grow: 1; font-size: 14px; padding: 10px 14px;
+  border: 1px solid #ccc; border-radius: 20px; outline: none;
+  margin: 0 10px;
 }
 .chat-input button {
-  width: auto; margin-left: 0; padding: 10px 20px; margin-bottom: 0;
+  background: #075e54; border: none; color: white;
+  border-radius: 20px; padding: 10px 20px; margin-left: 0;
+  cursor: pointer; font-size: 14px; width: auto;
+}
+.chat-input button:hover { background: #044137; }
+
+.icon-btn {
+  background: none; border: none; font-size: 24px;
+  cursor: pointer; padding: 0 5px; color: #555;
+  width: auto; margin: 0;
 }
 
-/* MESSAGES - EXACT TUMHARA CODE */
+/* Messages */
 .message {
-  padding: 8px 12px; border-radius: 8px;
-  max-width: 70%; word-wrap: break-word;
-  position: relative;
+  padding: 8px 12px; border-radius: 12px;
+  max-width: 70%; word-wrap: break-word; font-size: 15px;
+  position: relative; margin: 5px 0;
 }
 .my-message {
-  background: #dcf8c6; align-self: flex-end;
+  background-color: #dcf8c6; align-self: flex-end;
   text-align: right; margin-left: auto; cursor: pointer;
 }
 .other-message {
-  background: #fff; align-self: flex-start;
+  background-color: #fff; align-self: flex-start;
   text-align: left; margin-right: auto;
+  color: #555;
 }
 
-/* --- TUMHARA ORIGINAL DESIGN CODE (END) --- */
+.sender-name { font-size: 11px; font-weight: bold; color: #e55e5e; display: block; margin-bottom: 2px; }
+.msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; display: block; }
+.msg-time { font-size: 10px; color: #777; display: block; margin-top: 3px; }
 
-
-/* --- EXTRA CSS FOR FUNCTIONALITY (Camera, Errors, Popup) --- */
-
-/* 1. Header Buttons (Logout/Profile) */
-.header-actions button {
-  background: rgba(255,255,255,0.2); width: auto;
-  padding: 5px 10px; font-size: 12px; margin: 0 0 0 5px;
-}
-
-/* 2. Camera Button Styling */
-.icon-btn {
-  background: none; border: none; font-size: 24px;
-  cursor: pointer; padding: 0 5px; color: #555; width: auto;
-}
-
-/* 3. Error Message (Red Text, No Alert) */
-#auth-error-msg {
-  color: #d32f2f; font-size: 14px; margin-top: 10px;
-  display: none; background: #ffebee; padding: 10px; border-radius: 5px;
-}
-
-/* 4. Custom Popup Modal */
+/* --- CUSTOM MODAL & TOAST --- */
 #custom-modal {
   display: none; position: absolute; top: 0; left: 0;
   width: 100%; height: 100%; background: rgba(0,0,0,0.5);
   z-index: 200; justify-content: center; align-items: center;
-  border-radius: 24px; /* Container radius match */
+  border-radius: 14px; /* Matches chat screen radius */
 }
 .modal-content {
   background: white; padding: 25px; border-radius: 15px;
@@ -136,10 +162,7 @@ button:hover { background: #128c7e; }
   border-radius: 5px; margin: 15px 0; display: none;
 }
 .modal-btn { width: auto; padding: 8px 20px; margin: 5px; font-size: 14px; }
-.btn-confirm { background: #25d366; }
-.btn-cancel { background: #ff4444; }
 
-/* 5. Toast Notification */
 #toast-box {
   visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
   text-align: center; border-radius: 50px; padding: 12px;
@@ -147,12 +170,6 @@ button:hover { background: #128c7e; }
   transform: translateX(-50%); font-size: 14px;
 }
 #toast-box.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-
-/* 6. Message Elements (Name, Time, Image) */
-.sender-name { font-size: 11px; font-weight: bold; color: #e55e5e; margin-bottom: 2px; display: block; }
-.msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; display: block; }
-.msg-time { font-size: 10px; color: #777; display: block; margin-top: 3px; }
-
 @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
 @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
