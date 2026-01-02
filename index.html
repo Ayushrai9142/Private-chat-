@@ -2,64 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Private Chat</title>
-
 <link rel="manifest" href="manifest.json">
-
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container" id="login-container">
-  <h2>Welcome Back</h2>
-  <p style="margin-bottom: 20px; color: #444;">Login to continue chatting</p>
-
-  <div class="input-group">
-    <input type="email" id="email" placeholder="Email Address" required />
-  </div>
-
-  <div class="input-group">
-    <input type="password" id="password" placeholder="Password" required />
-  </div>
-
-  <button id="login-btn">Login</button>
-  
-  <div style="margin: 15px 0; color: #666;">or</div>
-  
-  <button id="signup-btn" class="signup-btn">Sign Up</button>
-
   <div id="auth-error-msg"></div>
+
+  <div id="login-screen-content">
+    <h2>Welcome Back</h2>
+    <p class="desc">Login to continue chatting</p>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Email" required />
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password" required />
+    </div>
+
+    <button id="login-btn">Login</button>
+    <div class="divider">or</div>
+    <button id="signup-btn" class="signup-btn">Sign Up</button>
+  </div>
 </div>
 
 <div id="chat-screen">
   <div class="chat-header">
-    <span>Chat Room</span>
+    <span>Private Room</span>
     <div class="header-actions">
-      <button id="profile-btn">👤 Name</button>
+      <button id="profile-btn">Name</button>
       <button id="logout-btn" style="background:#ff4444;">Logout</button>
     </div>
   </div>
-
+  
   <div class="chat-box" id="chat-box"></div>
-
-  <div class="chat-input-area">
-    <button class="icon-btn" id="upload-trigger">📷</button>
+  
+  <div class="chat-input">
+    <button class="icon-btn" id="upload-trigger" style="background:none; border:none; color:#555;">📷</button>
     <input type="file" id="image-input" accept="image/*" hidden>
     
     <input type="text" id="message-input" placeholder="Type a message..." />
-    <button class="icon-btn" id="send-msg-btn" style="color: #075e54;">➤</button>
+    <button id="send-msg-btn">Send</button>
   </div>
-</div>
 
-<div id="custom-modal">
-  <div class="modal-content">
-    <h3 id="modal-title" style="color:#333; margin-bottom: 15px;">Title</h3>
-    <input type="text" id="modal-input" placeholder="Enter here...">
-    
-    <div style="margin-top: 10px;">
-      <button id="modal-cancel" class="modal-btn btn-cancel">Cancel</button>
-      <button id="modal-confirm" class="modal-btn btn-confirm">OK</button>
+  <div id="custom-modal">
+    <div class="modal-content">
+      <h3 id="modal-title" style="color:#333; margin-bottom:10px;">Title</h3>
+      <input type="text" id="modal-input" placeholder="Enter here...">
+      <div>
+        <button id="modal-cancel" class="modal-btn" style="background:#ff4444;">Cancel</button>
+        <button id="modal-confirm" class="modal-btn" style="background:#25d366;">OK</button>
+      </div>
     </div>
   </div>
 </div>
@@ -67,11 +64,8 @@
 <div id="toast-box">Notification</div>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 </script>
-
 <script type="module" src="script.js"></script>
 
 </body>
