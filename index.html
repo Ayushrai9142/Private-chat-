@@ -4,8 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Private Chat</title>
+  <link rel="manifest" href="manifest.json">
+  
 <style>
-  /* CSS wahi purana wala same rahega, bas yahan paste kar raha hu formatting ke liye */
+  
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
   body, html { height: 100%; background: #e5ddd5; display: flex; justify-content: center; align-items: center; padding: 20px; }
   .container { width: 100%; max-width: 600px; background: rgba(255,255,255,0.9); border-radius: 24px; padding: 36px 30px; box-shadow: 0 8px 40px rgba(7,94,84,0.14); text-align: center; color: #075e54; }
@@ -56,6 +58,12 @@
   </div>
 </div>
 
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+  </script>
+  
 <script type="module" src="script.js"></script>
 
 </body>
