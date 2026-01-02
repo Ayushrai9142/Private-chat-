@@ -3,15 +3,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// Yahan apni Firebase Settings paste karo
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAab5Ax1gKYWxNhWYX8jerbNG3hr0Ui7Fs",
-authDomain: "private-chat-6d5e6.firebaseapp.com",
-databaseURL: "https://private-chat-6d5e6-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "private-chat-6d5e6",
-storageBucket: "private-chat-6d5e6.firebasestorage.app",
-messagingSenderId: "326060141451",
-appId: "1:326060141451:web:f8f1671d4736e98d9ddd8e"
+ apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
+authDomain: "private-chat-5c4c9.firebaseapp.com",
+databaseURL: "https://private-chat-5c4c9-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "private-chat-5c4c9",
+storageBucket: "private-chat-5c4c9.firebasestorage.app",
+messagingSenderId: "505196940742",
+appId: "1:505196940742:web:313cf8d64fa9cb478d76c7"
 };
 
 // Initialize Firebase
