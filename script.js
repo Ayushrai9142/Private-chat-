@@ -1,63 +1,118 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js";
+// Firebase libraries import kar rahe hain (CDN se direct)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+// Yahan apni Firebase Settings paste karo
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-const loginScreen = document.getElementById("login-screen");
+// HTML Elements
+const loginContainer = document.getElementById("login-container");
 const chatScreen = document.getElementById("chat-screen");
 const chatBox = document.getElementById("chat-box");
-const messageInput = document.getElementById("message-input");
+const msgInput = document.getElementById("message-input");
 
-function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => showChat())
-    .catch(alert);
-}
+const emailInput = document.getElementById("email");
+const passInput = document.getElementById("password");
+const loginBtn = document.getElementById("login-btn");
+const signupBtn = document.getElementById("signup-btn");
+const sendBtn = document.getElementById("send-msg-btn");
 
-function signup() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  createUserWithEmailAndPassword(auth, email, password)
-    .then(() => showChat())
-    .catch(alert);
-}
+let currentUser = null;
 
-function showChat() {
-  loginScreen.style.display = "none";
-  chatScreen.style.display = "block";
-}
+// --- Authentication Logic ---
+
+// Login Button Click
+loginBtn.addEventListener("click", () => {
+    const email = emailInput.value;
+    const password = passInput.value;
+    signInWithEmailAndPassword(auth, email, password)
+        .catch((error) => alert("Error: " + error.message));
+});
+
+// Signup Button Click
+signupBtn.addEventListener("click", () => {
+    const email = emailInput.value;
+    const password = passInput.value;
+    createUserWithEmailAndPassword(auth, email, password)
+        .then(() => alert("Account created! Now you can login."))
+        .catch((error) => alert("Error: " + error.message));
+});
+
+// Check if user is logged in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        loginContainer.style.display = "none";
+        chatScreen.style.display = "flex"; // Show chat
+        loadMessages(); // Load old messages
+    } else {
+        loginContainer.style.display = "block";
+        chatScreen.style.display = "none";
+    }
+});
+
+// --- Chat Logic ---
 
 function sendMessage() {
-  const message = messageInput.value.trim();
-  if (message) {
-    const msgRef = ref(db, "messages");
-    push(msgRef, {
-      text: message,
-      time: Date.now(),
-    });
-    messageInput.value = "";
-  }
+    const text = msgInput.value.trim();
+    if (text && currentUser) {
+        // Database me message bhejo
+        push(ref(db, "messages"), {
+            text: text,
+            sender: currentUser.email, // Pata chale kisne bheja
+            timestamp: Date.now()
+        });
+        msgInput.value = "";
+    }
 }
 
-onChildAdded(ref(db, "messages"), (snapshot) => {
-  const msg = snapshot.val();
-  const p = document.createElement("p");
-  p.innerText = msg.text;
-  chatBox.appendChild(p);
-  chatBox.scrollTop = chatBox.scrollHeight;
+// Send button click
+sendBtn.addEventListener("click", sendMessage);
+
+// Enter key se send karna
+msgInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
 });
+
+// Messages receive karna (Real-time)
+function loadMessages() {
+    // Sirf ek baar listener lagana hai
+    // Note: Is logic ko simplify kiya hai taki duplication na ho
+    chatBox.innerHTML = ""; 
+    
+    onChildAdded(ref(db, "messages"), (snapshot) => {
+        const data = snapshot.val();
+        displayMessage(data);
+    });
+}
+
+function displayMessage(data) {
+    const div = document.createElement("div");
+    div.classList.add("message");
+    
+    // Check karo message mera hai ya kisi aur ka
+    if (data.sender === currentUser.email) {
+        div.classList.add("my-message");
+    } else {
+        div.classList.add("other-message");
+    }
+    
+    div.innerText = data.text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll to bottom
+}
+
