@@ -2,52 +2,112 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>Private Chat</title>
 <link rel="manifest" href="manifest.json">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
-  body, html { height: 100%; background: #e5ddd5; display: flex; justify-content: center; align-items: center; padding: 0; }
+  /* --- Reset & Base --- */
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body, html { height: 100%; background-color: #e5ddd5; overflow: hidden; }
   
-  /* Container Setup */
-  .container { width: 100%; height: 100%; max-width: 600px; background: #fff; display: flex; flex-direction: column; position: relative; }
-  
-  /* Login Screen */
-  #login-container { padding: 40px; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.9); height: 100%; position: absolute; z-index: 10; width: 100%; }
-  h2 { color: #075e54; margin-bottom: 20px; }
-  input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
-  button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-  .btn-green { background: #25d366; color: white; }
-  .btn-green:hover { background: #128c7e; }
-  .btn-outline { background: transparent; border: 1px solid #075e54; color: #075e54; }
+  /* --- Main Container --- */
+  .container {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
 
-  /* Chat Screen */
-  #chat-screen { display: none; flex-direction: column; height: 100%; width: 100%; }
+  /* --- Login Screen --- */
+  #login-container {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #fff;
+    z-index: 100; /* Sabse upar */
+    display: flex; /* Flexbox wapas laye */
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px;
+  }
   
+  #login-container h2 { color: #075e54; margin-bottom: 30px; text-align: center; }
+  #login-container input {
+    width: 100%; padding: 15px; margin-bottom: 15px;
+    border: 1px solid #ddd; border-radius: 8px;
+    font-size: 16px; background: #f9f9f9;
+  }
+  
+  /* --- Buttons --- */
+  .btn-primary { background: #25d366; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+  .btn-secondary { background: transparent; color: #075e54; border: 1px solid #075e54; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; }
+
+  /* --- Chat Screen --- */
+  #chat-screen {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    z-index: 50;
+  }
+
   /* Header */
-  .chat-header { background: #075e54; color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-  .header-title { font-weight: bold; font-size: 18px; }
-  .header-actions button { background: transparent; color: white; border: 1px solid white; padding: 5px 10px; font-size: 12px; border-radius: 4px; margin-left: 5px; }
+  .chat-header {
+    background: #075e54; color: white;
+    padding: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0; /* Header fix rahega */
+  }
+  .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 5px; }
 
-  /* Chat Box */
-  .chat-box { flex-grow: 1; padding: 15px; background: #e5ddd5; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  /* Messages Area */
+  .chat-box {
+    flex-grow: 1;
+    background: #e5ddd5; /* WhatsApp BG color */
+    padding: 15px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 8px;
+  }
 
-  /* Input Area */
-  .chat-input-area { background: #f0f0f0; padding: 10px; display: flex; align-items: center; border-top: 1px solid #ddd; }
-  .chat-input-area input[type="text"] { flex-grow: 1; padding: 10px; border-radius: 20px; border: none; outline: none; margin: 0 10px; }
-  .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; margin: 0; color: #555; width: auto; }
+  /* Message Bubbles */
+  .message {
+    max-width: 80%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    position: relative;
+    word-wrap: break-word;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  }
+  .my-message { align-self: flex-end; background: #dcf8c6; }
+  .other-message { align-self: flex-start; background: #fff; }
   
-  /* Messages */
-  .message { max-width: 75%; padding: 8px 12px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; }
-  .my-message { background: #dcf8c6; align-self: flex-end; border-radius: 8px 0 8px 8px; }
-  .other-message { background: #fff; align-self: flex-start; border-radius: 0 8px 8px 8px; }
-  
-  .sender-name { font-size: 10px; font-weight: bold; color: #e55e5e; margin-bottom: 2px; }
-  .msg-time { font-size: 9px; color: #999; text-align: right; margin-top: 4px; }
-  .msg-img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; }
-  
-  /* Delete Button */
-  .delete-btn { font-size: 10px; color: red; cursor: pointer; margin-left: 5px; font-weight: bold; border: 1px solid red; padding: 0 4px; border-radius: 4px; display: inline-block; }
+  .sender-name { font-size: 11px; font-weight: bold; color: #e55e5e; margin-bottom: 2px; }
+  .msg-time { font-size: 10px; color: #777; text-align: right; margin-top: 3px; display: block; }
+  .msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; display: block; }
+
+  /* Delete Icon */
+  .delete-btn { color: #ff0000; font-weight: bold; margin-left: 8px; cursor: pointer; font-size: 12px; }
+
+  /* Footer / Input */
+  .chat-input-area {
+    background: #f0f0f0;
+    padding: 10px;
+    display: flex; align-items: center;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0; /* Input fix rahega */
+  }
+  .chat-input-area input {
+    flex-grow: 1; padding: 12px 15px;
+    border-radius: 25px; border: none; outline: none;
+    margin: 0 8px; font-size: 15px;
+  }
+  .icon-btn { background: none; border: none; font-size: 22px; padding: 5px; cursor: pointer; color: #555; }
+  .send-icon { color: #075e54; font-weight: bold; }
 
 </style>
 </head>
@@ -55,20 +115,20 @@
 
 <div class="container">
 
-  <div id="login-container" style="display: flex;">
+  <div id="login-container">
     <h2>🔐 Private Chat</h2>
     <input type="email" id="email" placeholder="Email Address" />
     <input type="password" id="password" placeholder="Password" />
-    <button id="login-btn" class="btn-green">Login</button>
-    <button id="signup-btn" class="btn-outline">Create Account</button>
+    <button id="login-btn" class="btn-primary">Login</button>
+    <button id="signup-btn" class="btn-secondary">Create Account</button>
   </div>
 
   <div id="chat-screen">
     <div class="chat-header">
-      <div class="header-title">Chat Room</div>
-      <div class="header-actions">
-        <button id="profile-btn">👤 Name</button>
-        <button id="logout-btn" style="background:#ff4444; border:none;">Logout</button>
+      <span style="font-weight:bold; font-size: 18px;">Chat Room</span>
+      <div>
+        <button id="profile-btn" class="header-btn">👤 Name</button>
+        <button id="logout-btn" class="header-btn" style="background:#ff5555;">Logout</button>
       </div>
     </div>
 
@@ -79,7 +139,8 @@
       <input type="file" id="image-input" accept="image/*" hidden>
       
       <input type="text" id="message-input" placeholder="Type a message..." />
-      <button class="icon-btn" id="send-msg-btn" style="color: #075e54;">➤</button>
+      
+      <button class="icon-btn send-icon" id="send-msg-btn">➤</button>
     </div>
   </div>
 
