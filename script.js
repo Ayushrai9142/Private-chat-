@@ -5,13 +5,13 @@ import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/fi
 
 // Yahan apni Firebase Settings paste karo
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAab5Ax1gKYWxNhWYX8jerbNG3hr0Ui7Fs",
+authDomain: "private-chat-6d5e6.firebaseapp.com",
+databaseURL: "https://private-chat-6d5e6-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "private-chat-6d5e6",
+storageBucket: "private-chat-6d5e6.firebasestorage.app",
+messagingSenderId: "326060141451",
+appId: "1:326060141451:web:f8f1671d4736e98d9ddd8e"
 };
 
 // Initialize Firebase
