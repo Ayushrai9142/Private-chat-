@@ -3,252 +3,57 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login and Chat App</title>
+<title>Private Chat</title>
 <style>
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-  }
-  body, html {
-    height: 100%;
-    background: #e5ddd5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px; /* desktop padding */
-  }
+  /* CSS wahi purana wala same rahega, bas yahan paste kar raha hu formatting ke liye */
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+  body, html { height: 100%; background: #e5ddd5; display: flex; justify-content: center; align-items: center; padding: 20px; }
+  .container { width: 100%; max-width: 600px; background: rgba(255,255,255,0.9); border-radius: 24px; padding: 36px 30px; box-shadow: 0 8px 40px rgba(7,94,84,0.14); text-align: center; color: #075e54; }
+  h2 { font-size: 2em; margin-bottom: 10px; }
+  .input-group { margin-bottom: 20px; text-align: left; }
+  .input-group input { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid #ccc; outline: none; }
+  button { width: 100%; background: #25d366; border: none; padding: 15px; border-radius: 8px; color: #fff; cursor: pointer; margin-bottom: 12px; font-weight: bold; }
+  button:hover { background: #128c7e; }
+  .signup-btn { background: #075e54; }
+  
+  /* Screens logic */
+  #chat-screen { display: none; background: #fff; border-radius: 14px; width: 100%; max-width: 700px; height: 600px; flex-direction: column; }
+  .chat-header { background: #075e54; color: white; padding: 14px; border-radius: 14px 14px 0 0; }
+  .chat-box { flex-grow: 1; padding: 16px; background: #e5ddd5; overflow-y: auto; display: flex; flex-direction: column; }
+  .chat-input { display: flex; padding: 10px; background: #f0f0f0; border-radius: 0 0 14px 14px; }
+  .chat-input input { flex-grow: 1; padding: 10px; border-radius: 20px; border: none; outline: none; }
+  .chat-input button { width: auto; margin-left: 10px; padding: 10px 20px; margin-bottom: 0; }
 
-  .container {
-    width: 100%;
-    max-width: 600px; /* desktop friendly */
-    background: rgba(255,255,255,0.3);
-    border-radius: 24px;
-    padding: 36px 30px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 8px 40px rgba(7,94,84,0.14);
-    text-align: center;
-    color: #075e54;
-  }
-  h2 {
-    font-size: 2em;
-    margin-bottom: 10px;
-  }
-  p.desc {
-    font-size: 1em;
-    margin-bottom: 25px;
-    color: #444;
-  }
-  .input-group {
-    margin-bottom: 20px;
-    text-align: left;
-    position: relative;
-  }
-  .input-group input {
-    width: 100%;
-    padding: 14px 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1em;
-    outline: none;
-    background: #fff;
-    color: #333;
-    transition: border-color 0.3s;
-  }
-  .input-group input:focus {
-    border-color: #075e54;
-    box-shadow: 0 0 8px rgba(7,94,84,0.3);
-  }
-  .input-group label {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #999;
-    font-size: 14px;
-    pointer-events: none;
-    transition: 0.3s;
-  }
-  .input-group input:focus + label,
-  .input-group input:not(:placeholder-shown) + label {
-    top: -8px;
-    font-size: 12px;
-    color: #075e54;
-    background: #e5ddd5;
-    padding: 0 6px;
-    border-radius: 4px;
-  }
-  button {
-    width: 100%;
-    background: #25d366;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 1.1em;
-    cursor: pointer;
-    margin-bottom: 12px;
-    transition: background 0.2s;
-  }
-  button:hover {
-    background: #128c7e;
-  }
-  .divider {
-    margin: 15px 0;
-    font-size: 14px;
-    color: #666;
-  }
-  .signup-btn {
-    background: #075e54;
-  }
-  .signup-btn:hover {
-    background: #05473d;
-  }
-
-  /* Chat Screen */
-  #chat-screen {
-    display: none;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    width: 100%;
-    max-width: 700px; /* desktop friendly */
-    height: 600px;    /* desktop friendly */
-    display: flex;
-    flex-direction: column;
-  }
-  .chat-header {
-    background-color: #075e54;
-    color: white;
-    padding: 14px;
-    font-size: 20px;
-    border-radius: 14px 14px 0 0;
-    font-weight: 600;
-  }
-  .chat-box {
-    flex-grow: 1;
-    padding: 16px;
-    background: #f5f5f5;
-    overflow-y: auto;
-    border-bottom: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-  }
-  .chat-input {
-    display: flex;
-    padding: 10px 14px;
-    background: #fff;
-    border-radius: 0 0 14px 14px;
-    border-top: 1px solid #ddd;
-  }
-  .chat-input input {
-    flex-grow: 1;
-    font-size: 14px;
-    padding: 10px 14px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    outline: none;
-  }
-  .chat-input button {
-    background: #075e54;
-    border: none;
-    color: white;
-    border-radius: 20px;
-    padding: 10px 20px;
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-  }
-  .chat-input button:hover {
-    background: #044137;
-  }
-
-  /* Chat message alignment and styles */
-  .user-message {
-    background-color: #dcf8c6;
-    border-radius: 12px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    max-width: 70%;
-    align-self: flex-end;
-    margin-left: auto;
-    text-align: right;
-  }
-
-  .bot-message {
-    background-color: #f0f0f0;
-    color: #555;
-    font-style: italic;
-    border-radius: 12px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    max-width: 70%;
-    align-self: flex-start;
-    margin-right: auto;
-    text-align: left;
-  }
-
-  .typing-message {
-    background-color: #f0f0f0;
-    color: #888;
-    font-style: italic;
-    border-radius: 12px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    max-width: 70%;
-    align-self: flex-start;
-    margin-right: auto;
-    text-align: left;
-  }
-
-  @media (max-width: 768px) {
-    .container, #chat-screen {
-      width: 90vw;
-      height: 90vh;
-    }
-  }
+  /* Messages */
+  .message { padding: 8px 12px; border-radius: 8px; margin: 5px 0; max-width: 70%; word-wrap: break-word; }
+  .my-message { background: #dcf8c6; align-self: flex-end; text-align: right; margin-left: auto; }
+  .other-message { background: #fff; align-self: flex-start; text-align: left; margin-right: auto; }
 </style>
 </head>
 <body>
 
-<div class="container">
-
-  <!-- Login Screen -->
-  <form id="login-screen">
+<div class="container" id="login-container">
+  <div id="login-screen">
     <h2>Welcome Back</h2>
-    <p class="desc">Login to continue chatting</p>
-
-    <div class="input-group">
-      <input type="email" id="email" placeholder=" " required />
-      <label for="email">Email</label>
-    </div>
-
-    <div class="input-group">
-      <input type="password" id="password" placeholder=" " required />
-      <label for="password">Password</label>
-    </div>
-
-    <button type="button" onclick="login()">Login</button>
-
-    <div class="divider">or</div>
-
-    <button type="button" class="signup-btn" onclick="signup()">Sign Up</button>
-  </form>
-
-  <!-- Chat Screen -->
-  <div id="chat-screen">
-    <div class="chat-header">Chat App</div>
-    <div class="chat-box" id="chat-box"></div>
-    <div class="chat-input">
-      <input type="text" id="message-input" placeholder="Type a message..." />
-      <button onclick="sendMessage()">Send</button>
-    </div>
+    <div class="input-group"><input type="email" id="email" placeholder="Email" /></div>
+    <div class="input-group"><input type="password" id="password" placeholder="Password" /></div>
+    <button id="login-btn">Login</button>
+    <div style="margin:10px 0;">or</div>
+    <button id="signup-btn" class="signup-btn">Sign Up</button>
   </div>
-
 </div>
 
-<script src="app.js">
-</script>
+<div id="chat-screen">
+  <div class="chat-header">Private Room</div>
+  <div class="chat-box" id="chat-box"></div>
+  <div class="chat-input">
+    <input type="text" id="message-input" placeholder="Type a message..." />
+    <button id="send-msg-btn">Send</button>
+  </div>
+</div>
+
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
+
