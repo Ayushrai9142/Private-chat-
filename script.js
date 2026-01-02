@@ -1,17 +1,17 @@
 // Firebase libraries import kar rahe hain (CDN se direct)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-
+// Tumhari Firebase Config (Jo tumne di thi)
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
-authDomain: "private-chat-5c4c9.firebaseapp.com",
-databaseURL: "https://private-chat-5c4c9-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "private-chat-5c4c9",
-storageBucket: "private-chat-5c4c9.firebasestorage.app",
-messagingSenderId: "505196940742",
-appId: "1:505196940742:web:313cf8d64fa9cb478d76c7"
+ authDomain: "private-chat-5c4c9.firebaseapp.com",
+ databaseURL: "https://private-chat-5c4c9-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId: "private-chat-5c4c9",
+ storageBucket: "private-chat-5c4c9.firebasestorage.app",
+ messagingSenderId: "505196940742",
+ appId: "1:505196940742:web:313cf8d64fa9cb478d76c7"
 };
 
 // Initialize Firebase
@@ -52,6 +52,20 @@ signupBtn.addEventListener("click", () => {
         .catch((error) => alert("Error: " + error.message));
 });
 
+// Logout Button Logic (Naya Add kiya hai)
+// Note: Make sure index.html me logout-btn id wala button ho
+const logoutBtn = document.getElementById("logout-btn");
+if(logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => {
+            alert("Logged out!");
+            location.reload(); // Page refresh karega
+        }).catch((error) => {
+            alert("Error logging out: " + error.message);
+        });
+    });
+}
+
 // Check if user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -91,7 +105,6 @@ msgInput.addEventListener("keypress", (e) => {
 // Messages receive karna (Real-time)
 function loadMessages() {
     // Sirf ek baar listener lagana hai
-    // Note: Is logic ko simplify kiya hai taki duplication na ho
     chatBox.innerHTML = ""; 
     
     onChildAdded(ref(db, "messages"), (snapshot) => {
@@ -100,6 +113,7 @@ function loadMessages() {
     });
 }
 
+// Naya Display Function (Time aur Name ke sath)
 function displayMessage(data) {
     const div = document.createElement("div");
     div.classList.add("message");
@@ -111,7 +125,20 @@ function displayMessage(data) {
         div.classList.add("other-message");
     }
     
-    div.innerText = data.text;
+    // Time Format Karna
+    const date = new Date(data.timestamp);
+    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Name nikalna (Email ka pehla hissa)
+    const senderName = data.sender.split('@')[0];
+
+    // HTML set karna (Name + Message + Time)
+    div.innerHTML = `
+        <div style="font-size:10px; opacity:0.7; margin-bottom:2px; font-weight:bold;">${senderName}</div>
+        <div>${data.text}</div>
+        <div style="font-size:9px; opacity:0.6; text-align:right; margin-top:4px;">${timeString}</div>
+    `;
+    
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll to bottom
 }
