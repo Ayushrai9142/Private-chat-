@@ -1,94 +1,126 @@
-body {
-  margin: 0;
-  font-family: 'Poppins', Arial, sans-serif;
-  background: #e5ddd5;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* --- BASE RESET --- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+body, html { height: 100%; background: #e5ddd5; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
 
-.wrapper {
+/* --- LOGIN CONTAINER (Tumhara Pasandeeda Design) --- */
+.container {
   width: 100%;
-  max-width: 380px;
-  background: rgba(255, 255, 255, 0.30);
+  max-width: 500px; /* Mobile ke liye thoda adjust kiya taaki stretch na ho */
+  background: rgba(255,255,255,0.9);
   border-radius: 24px;
+  padding: 36px 30px;
   box-shadow: 0 8px 40px rgba(7,94,84,0.14);
-  padding: 36px 30px 30px 30px;
-  backdrop-filter: blur(8px);
   text-align: center;
-}
-
-.login-form h2 {
-  font-size: 2em;
-  font-weight: 600;
-  margin-bottom: 10px;
   color: #075e54;
+  position: absolute; /* Screen ke beech me rakhne ke liye */
+  z-index: 100;
 }
 
-.login-form p {
-  font-size: 1em;
-  margin-bottom: 22px;
-  color: #444;
+h2 { font-size: 2em; margin-bottom: 20px; }
+
+.input-group { margin-bottom: 15px; text-align: left; }
+.input-group input {
+  width: 100%; padding: 14px; border-radius: 8px;
+  border: 1px solid #ccc; outline: none; font-size: 16px;
 }
 
-.input-box {
-  margin-bottom: 22px;
-  text-align: left;
+/* --- BUTTONS --- */
+button {
+  width: 100%; background: #25d366; border: none;
+  padding: 15px; border-radius: 8px; color: #fff;
+  font-size: 1.1em; cursor: pointer; margin-bottom: 12px;
+  font-weight: bold; transition: 0.3s;
+}
+button:hover { background: #128c7e; }
+
+.signup-btn { background: #075e54; }
+.signup-btn:hover { background: #05473d; }
+
+/* --- ERROR MESSAGE (No Alert) --- */
+#auth-error-msg {
+  color: #d32f2f; font-size: 14px; margin-top: 10px;
+  display: none; background: #ffebee; padding: 10px; border-radius: 5px;
 }
 
-.input-box input {
-  width: 100%;
-  padding: 16px 12px;
-  margin-top: 3px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1em;
+/* --- CHAT SCREEN --- */
+#chat-screen {
+  display: none; background: #fff;
+  width: 100%; height: 100%; /* Full Screen */
+  flex-direction: column; z-index: 50;
+  position: absolute; top: 0; left: 0;
 }
 
-.input-box label {
-  color: #666;
-  font-size: 0.95em;
+.chat-header {
+  background: #075e54; color: white; padding: 15px;
+  font-size: 18px; font-weight: bold;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.header-actions button {
+  width: auto; background: rgba(255,255,255,0.2);
+  padding: 6px 12px; font-size: 12px; margin-left: 5px; margin-bottom: 0;
 }
 
-button, .signup-btn {
-  width: 100%;
-  background: #25d366;
-  color: #fff;
-  border: none;
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 1.1em;
-  font-weight: 500;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
+.chat-box {
+  flex-grow: 1; padding: 15px; background: #e5ddd5;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
 }
 
-button:hover, .signup-btn:hover {
-  background: #128c7e;
+/* --- MESSAGES --- */
+.message {
+  max-width: 80%; padding: 8px 12px; border-radius: 8px;
+  font-size: 15px; position: relative; word-wrap: break-word;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+.my-message { align-self: flex-end; background: #dcf8c6; cursor: pointer; }
+.other-message { align-self: flex-start; background: #fff; }
+
+.sender-name { font-size: 11px; font-weight: bold; color: #e55e5e; margin-bottom: 2px; display: block; }
+.msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; display: block; }
+.msg-time { font-size: 10px; color: #777; display: block; text-align: right; margin-top: 3px; }
+
+/* --- INPUT AREA --- */
+.chat-input-area {
+  display: flex; padding: 10px; background: #f0f0f0;
+  border-top: 1px solid #ddd; align-items: center;
+}
+.chat-input-area input {
+  flex-grow: 1; padding: 12px; border-radius: 20px;
+  border: none; outline: none; margin: 0 10px; font-size: 15px;
+}
+.icon-btn {
+  background: none; width: auto; padding: 5px; margin: 0;
+  color: #555; font-size: 24px; cursor: pointer;
 }
 
-.divider {
-  color: #888;
-  margin: 10px auto;
+/* --- CUSTOM MODAL (Popup) --- */
+#custom-modal {
+  display: none; position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+  z-index: 200; justify-content: center; align-items: center;
 }
+.modal-content {
+  background: white; padding: 25px; border-radius: 15px;
+  width: 85%; max-width: 320px; text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+#modal-input {
+  width: 100%; padding: 10px; border: 1px solid #ddd;
+  border-radius: 5px; margin: 15px 0; display: none;
+}
+.modal-btn { width: auto; padding: 8px 20px; margin: 5px; font-size: 14px; }
+.btn-confirm { background: #25d366; }
+.btn-cancel { background: #ff4444; }
 
-@media (max-width: 480px) {
-  .wrapper {
-    max-width: 95vw;
-    padding: 24px 8vw 18px 8vw;
-  }
-  .login-form h2 {
-    font-size: 1.5em;
-  }
-  .input-box input {
-    font-size: 0.95em;
-    padding: 12px 8px;
-  }
-  button, .signup-btn {
-    font-size: 1em;
-    padding: 12px;
-  }
+/* --- TOAST NOTIFICATION --- */
+#toast-box {
+  visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+  text-align: center; border-radius: 50px; padding: 12px;
+  position: fixed; z-index: 300; left: 50%; bottom: 30px;
+  transform: translateX(-50%); font-size: 14px;
 }
+#toast-box.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
