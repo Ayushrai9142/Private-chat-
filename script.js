@@ -1,9 +1,8 @@
-// Firebase libraries import kar rahe hain (CDN se direct)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// Tumhari Firebase Config (Jo tumne di thi)
+// --- TUMHARI ASLI KEYS (Direct Copy-Paste Ready) ---
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
  authDomain: "private-chat-5c4c9.firebaseapp.com",
@@ -14,132 +13,172 @@ const firebaseConfig = {
  appId: "1:505196940742:web:313cf8d64fa9cb478d76c7"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// HTML Elements
+// Elements
 const loginContainer = document.getElementById("login-container");
 const chatScreen = document.getElementById("chat-screen");
 const chatBox = document.getElementById("chat-box");
 const msgInput = document.getElementById("message-input");
+const imgInput = document.getElementById("image-input");
 
-const emailInput = document.getElementById("email");
-const passInput = document.getElementById("password");
+// Buttons
 const loginBtn = document.getElementById("login-btn");
 const signupBtn = document.getElementById("signup-btn");
+const logoutBtn = document.getElementById("logout-btn");
 const sendBtn = document.getElementById("send-msg-btn");
+const uploadBtn = document.getElementById("upload-trigger");
+const profileBtn = document.getElementById("profile-btn");
 
 let currentUser = null;
 
-// --- Authentication Logic ---
-
-// Login Button Click
+// --- Auth Functions ---
 loginBtn.addEventListener("click", () => {
-    const email = emailInput.value;
-    const password = passInput.value;
-    signInWithEmailAndPassword(auth, email, password)
-        .catch((error) => alert("Error: " + error.message));
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    signInWithEmailAndPassword(auth, email, pass).catch(e => alert(e.message));
 });
 
-// Signup Button Click
 signupBtn.addEventListener("click", () => {
-    const email = emailInput.value;
-    const password = passInput.value;
-    createUserWithEmailAndPassword(auth, email, password)
-        .then(() => alert("Account created! Now you can login."))
-        .catch((error) => alert("Error: " + error.message));
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    createUserWithEmailAndPassword(auth, email, pass)
+        .then(() => alert("Account Created! Please Login."))
+        .catch(e => alert(e.message));
 });
 
-// Logout Button Logic (Naya Add kiya hai)
-// Note: Make sure index.html me logout-btn id wala button ho
-const logoutBtn = document.getElementById("logout-btn");
 if(logoutBtn) {
     logoutBtn.addEventListener("click", () => {
-        signOut(auth).then(() => {
-            alert("Logged out!");
-            location.reload(); // Page refresh karega
-        }).catch((error) => {
-            alert("Error logging out: " + error.message);
-        });
+        signOut(auth).then(() => location.reload());
     });
 }
 
-// Check if user is logged in
+// Update Name Feature
+if(profileBtn) {
+    profileBtn.addEventListener("click", () => {
+        const newName = prompt("Enter your Display Name:", currentUser.displayName || "");
+        if (newName) {
+            updateProfile(currentUser, { displayName: newName }).then(() => {
+                alert("Name Updated! Next messages will show new name.");
+            });
+        }
+    });
+}
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
         loginContainer.style.display = "none";
-        chatScreen.style.display = "flex"; // Show chat
-        loadMessages(); // Load old messages
+        chatScreen.style.display = "flex";
+        loadMessages();
     } else {
-        loginContainer.style.display = "block";
+        loginContainer.style.display = "flex";
         chatScreen.style.display = "none";
     }
 });
 
 // --- Chat Logic ---
 
-function sendMessage() {
-    const text = msgInput.value.trim();
-    if (text && currentUser) {
-        // Database me message bhejo
-        push(ref(db, "messages"), {
-            text: text,
-            sender: currentUser.email, // Pata chale kisne bheja
-            timestamp: Date.now()
-        });
-        msgInput.value = "";
-    }
+function sendMessage(text = "", imageUrl = null) {
+    if ((!text && !imageUrl) || !currentUser) return;
+
+    // Use displayName if available, else email prefix
+    const name = currentUser.displayName || currentUser.email.split('@')[0];
+
+    push(ref(db, "messages"), {
+        text: text,
+        imageUrl: imageUrl,
+        sender: currentUser.email,
+        senderName: name,
+        timestamp: Date.now()
+    });
+    msgInput.value = "";
 }
 
-// Send button click
-sendBtn.addEventListener("click", sendMessage);
+sendBtn.addEventListener("click", () => sendMessage(msgInput.value.trim()));
+msgInput.addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(msgInput.value.trim()); });
 
-// Enter key se send karna
-msgInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage();
-});
+// --- Image Upload Logic (Base64 < 100KB) ---
+if(uploadBtn) {
+    uploadBtn.addEventListener("click", () => imgInput.click());
 
-// Messages receive karna (Real-time)
-function loadMessages() {
-    // Sirf ek baar listener lagana hai
-    chatBox.innerHTML = ""; 
-    
-    onChildAdded(ref(db, "messages"), (snapshot) => {
-        const data = snapshot.val();
-        displayMessage(data);
+    imgInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Size Check (100KB Limit = 100 * 1024 bytes)
+        if (file.size > 100 * 1024) {
+            alert("Image too big! Please select image less than 100KB.");
+            imgInput.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            sendMessage("", event.target.result); // Send image as Base64 string
+        };
+        reader.readAsDataURL(file);
     });
 }
 
-// Naya Display Function (Time aur Name ke sath)
-function displayMessage(data) {
+// --- Display & Delete Logic ---
+function loadMessages() {
+    chatBox.innerHTML = "";
+    
+    // Message Aaya
+    onChildAdded(ref(db, "messages"), (snapshot) => {
+        const msg = snapshot.val();
+        const key = snapshot.key; // Message ID for deletion
+        displayMessage(msg, key);
+    });
+
+    // Message Delete Hua
+    onChildRemoved(ref(db, "messages"), (snapshot) => {
+        const key = snapshot.key;
+        const msgDiv = document.getElementById(key);
+        if (msgDiv) msgDiv.remove();
+    });
+}
+
+function displayMessage(data, key) {
     const div = document.createElement("div");
     div.classList.add("message");
+    div.id = key; // ID set kar rahe hain taaki delete kar sakein
+
+    const isMe = data.sender === currentUser.email;
+    div.classList.add(isMe ? "my-message" : "other-message");
+
+    const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
-    // Check karo message mera hai ya kisi aur ka
-    if (data.sender === currentUser.email) {
-        div.classList.add("my-message");
-    } else {
-        div.classList.add("other-message");
+    // Content Build
+    let contentHtml = `<div class="sender-name">${data.senderName || 'User'}</div>`;
+    
+    if (data.imageUrl) {
+        contentHtml += `<img src="${data.imageUrl}" class="msg-img">`;
     }
-    
-    // Time Format Karna
-    const date = new Date(data.timestamp);
-    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (data.text) {
+        contentHtml += `<div>${data.text}</div>`;
+    }
 
-    // Name nikalna (Email ka pehla hissa)
-    const senderName = data.sender.split('@')[0];
-
-    // HTML set karna (Name + Message + Time)
-    div.innerHTML = `
-        <div style="font-size:10px; opacity:0.7; margin-bottom:2px; font-weight:bold;">${senderName}</div>
-        <div>${data.text}</div>
-        <div style="font-size:9px; opacity:0.6; text-align:right; margin-top:4px;">${timeString}</div>
-    `;
+    contentHtml += `<div class="msg-time">${time}`;
     
+    // Delete Button (Sirf mere message pe)
+    if (isMe) {
+        contentHtml += `<span class="delete-btn" onclick="deleteMsg('${key}')">🗑</span>`;
+    }
+    contentHtml += `</div>`;
+
+    div.innerHTML = contentHtml;
     chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+// Global function to handle delete click
+window.deleteMsg = function(key) {
+    if (confirm("Delete this message?")) {
+        remove(ref(db, "messages/" + key));
+    }
+};
 
