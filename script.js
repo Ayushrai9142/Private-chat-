@@ -2,7 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// --- YOUR CONFIG ---
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
  authDomain: "private-chat-5c4c9.firebaseapp.com",
@@ -36,31 +35,26 @@ const modalCancel = document.getElementById("modal-cancel");
 let currentUser = null;
 let modalCallback = null;
 
-// --- Helper: Show Auth Error (Screen par Text) ---
+// --- Helpers ---
 function showAuthError(message) {
-    // English error ko Hindi/Easy language me convert karna
     let cleanMsg = message;
-    if(message.includes("user-not-found")) cleanMsg = "Account nahi mila. Sign Up karein.";
-    else if(message.includes("wrong-password")) cleanMsg = "Password galat hai.";
-    else if(message.includes("email-already-in-use")) cleanMsg = "Email pehle se use ho raha hai.";
-    else if(message.includes("weak-password")) cleanMsg = "Password kamjor hai (6+ words rakhein).";
-    else if(message.includes("invalid-email")) cleanMsg = "Email dhang se likhein.";
+    if(message.includes("user-not-found")) cleanMsg = "User not found. Please Sign Up.";
+    else if(message.includes("wrong-password")) cleanMsg = "Wrong password.";
+    else if(message.includes("email-already-in-use")) cleanMsg = "Email already in use.";
+    else if(message.includes("weak-password")) cleanMsg = "Password is too weak.";
+    else if(message.includes("invalid-email")) cleanMsg = "Invalid email address.";
     
     authErrorMsg.innerText = cleanMsg;
     authErrorMsg.style.display = "block";
-    
-    // 3 second baad error hata do
     setTimeout(() => { authErrorMsg.style.display = "none"; }, 4000);
 }
 
-// --- Helper: Show Toast (Notification) ---
 function showToast(text) {
     toastBox.innerText = text;
     toastBox.className = "show";
     setTimeout(() => { toastBox.className = toastBox.className.replace("show", ""); }, 3000);
 }
 
-// --- Helper: Custom Modal ---
 function showModal(title, needsInput, callback) {
     modalTitle.innerText = title;
     modal.style.display = "flex";
@@ -73,6 +67,7 @@ function showModal(title, needsInput, callback) {
         modalInput.style.display = "none";
     }
 }
+
 function closeModal() { modal.style.display = "none"; modalCallback = null; }
 modalCancel.addEventListener("click", closeModal);
 modalConfirm.addEventListener("click", () => {
@@ -80,7 +75,7 @@ modalConfirm.addEventListener("click", () => {
     closeModal();
 });
 
-// --- Auth Logic ---
+// --- Auth ---
 document.getElementById("login-btn").addEventListener("click", () => {
     authErrorMsg.style.display = "none";
     signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value)
@@ -90,16 +85,16 @@ document.getElementById("login-btn").addEventListener("click", () => {
 document.getElementById("signup-btn").addEventListener("click", () => {
     authErrorMsg.style.display = "none";
     createUserWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value)
-    .then(() => showToast("Account ban gaya! Ab Login karein."))
+    .then(() => showToast("Account created! Please Login."))
     .catch(e => showAuthError(e.message));
 });
 
 document.getElementById("logout-btn").addEventListener("click", () => signOut(auth).then(() => location.reload()));
 
 document.getElementById("profile-btn").addEventListener("click", () => {
-    showModal("New Name:", true, (newName) => {
+    showModal("Change Display Name", true, (newName) => {
         if (newName && newName.trim() !== "") {
-            updateProfile(currentUser, { displayName: newName }).then(() => showToast("Name change ho gaya!"));
+            updateProfile(currentUser, { displayName: newName }).then(() => showToast("Name updated successfully!"));
         }
     });
 });
@@ -116,10 +111,15 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// --- Chat Logic ---
+// --- Chat ---
 function sendMessage(text = "", imageUrl = null) {
     if ((!text && !imageUrl) || !currentUser) return;
-    let displayName = currentUser.displayName || currentUser.email.split('@')[0];
+    
+    let displayName = currentUser.displayName;
+    if (!displayName) {
+        displayName = currentUser.email.split('@')[0];
+    }
+
     push(ref(db, "messages"), {
         text: text, imageUrl: imageUrl, sender: currentUser.email, senderName: displayName, timestamp: Date.now()
     });
@@ -137,10 +137,11 @@ imgInput.addEventListener("change", (e) => {
         reader.onload = (ev) => sendMessage("", ev.target.result);
         reader.readAsDataURL(file);
     } else {
-        showToast("Image size 100KB se kam rakhein!");
+        showToast("Image too big! Max 100KB allowed.");
     }
 });
 
+// --- Messages ---
 function loadMessages() {
     chatBox.innerHTML = "";
     onChildAdded(ref(db, "messages"), (s) => displayMessage(s.val(), s.key));
@@ -157,23 +158,26 @@ function displayMessage(data, key) {
     const isMe = data.sender === currentUser.email;
     div.classList.add(isMe ? "my-message" : "other-message");
 
-    // Click to Delete (Modal use karega)
+    const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Sirf content dikhayenge (Trash Icon Removed)
+    let html = `<span class="sender-name">${data.senderName}</span>`;
+    if (data.imageUrl) html += `<img src="${data.imageUrl}" class="msg-img">`;
+    if (data.text) html += `<div>${data.text}</div>`;
+    
+    html += `<span class="msg-time">${time}</span>`;
+    div.innerHTML = html;
+
+    // HIDDEN DELETE: Pure message pe click karne par delete puchega
     if (isMe) {
         div.addEventListener("click", () => {
-            showModal("Delete karein?", false, () => {
+            showModal("Delete this message?", false, () => {
                 remove(ref(db, "messages/" + key));
                 showToast("Message deleted");
             });
         });
     }
 
-    const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    let html = `<div class="sender-name">${data.senderName}</div>`;
-    if (data.imageUrl) html += `<img src="${data.imageUrl}" class="msg-img">`;
-    if (data.text) html += `<div>${data.text}</div>`;
-    html += `<div style="font-size:9px; text-align:right; color:#777; margin-top:3px;">${time}</div>`;
-    
-    div.innerHTML = html;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
