@@ -23,6 +23,7 @@
   <div class="users-header">
     <span>Contacts</span>
     <div class="header-btns">
+      <button id="add-friend-btn" class="small-btn" style="background:#fff; color:#075e54; font-weight:bold;">➕ Add</button>
       <button id="profile-btn" class="small-btn">👤 Profile</button>
       <button id="logout-btn" class="small-btn" style="background:#ff4444;">Logout</button>
     </div>
@@ -34,7 +35,7 @@
 
 <div id="chat-screen">
   <div class="chat-header">
-    <div class="header-content">
+    <div style="display:flex; align-items:center;">
       <button id="back-btn" class="back-btn">←</button>
       <span id="chat-user-name">Chat</span>
     </div>
@@ -53,9 +54,23 @@
 <div id="custom-modal">
   <div class="modal-content">
     <h3 id="modal-title">Title</h3>
+    
+    <div id="profile-section" style="display:none;">
+      <p style="font-size:12px; color:#666;">Share this ID with friends:</p>
+      <div class="uid-box" id="my-uid-text">...</div>
+      <button id="copy-uid-btn" class="copy-btn">Copy ID</button>
+      <hr style="margin:15px 0; border:0; border-top:1px solid #eee;">
+    </div>
+
+    <div id="requests-section" style="display:none; text-align:left; margin-top:10px;">
+       <h4 style="font-size:14px; color:#075e54; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:10px;">Friend Requests:</h4>
+       <div id="requests-list"></div>
+    </div>
+
     <input type="text" id="modal-input">
-    <div>
-      <button id="modal-cancel" class="modal-btn" style="background:#ff4444; color:white;">Cancel</button>
+    
+    <div style="margin-top:15px;">
+      <button id="modal-cancel" class="modal-btn" style="background:#ff4444; color:white;">Close</button>
       <button id="modal-confirm" class="modal-btn" style="background:#25d366; color:white;">OK</button>
     </div>
   </div>
@@ -68,5 +83,5 @@
 <script type="module" src="script.js"></script>
 
 </body>
-        </html>
+</html>
 
