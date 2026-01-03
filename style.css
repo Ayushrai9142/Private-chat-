@@ -141,4 +141,4 @@ button {
 #toast-box.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
 @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-
+  
