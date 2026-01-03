@@ -3,6 +3,7 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square&logo=javascript)
 ![Firebase](https://img.shields.io/badge/Firebase-Backend-orange?style=flat-square&logo=firebase)
 ![PWA](https://img.shields.io/badge/PWA-Ready-purple?style=flat-square&logo=pwa)
+![License](https://img.shields.io/github/license/ayushraistudio/private-chat?style=flat-square&color=blue)
 
 > A secure, real-time messaging Progressive Web App built focusing on privacy. Features Global Chat, Private Messaging via Unique IDs, and a beautiful Milky White Glassmorphism UI.
 
@@ -43,7 +44,7 @@
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
