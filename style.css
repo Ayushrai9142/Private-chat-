@@ -3,7 +3,8 @@
 
 body, html {
   height: 100%; width: 100%;
-  background: #e5ddd5;
+  /* Change: Background Beige se Cool Grey kar diya */
+  background: #eceff1;
   display: flex; justify-content: center; align-items: center;
   overflow: hidden;
 }
@@ -13,8 +14,10 @@ body, html {
   width: 95%; max-width: 500px;
   background: rgba(255,255,255,0.9); /* Milky White */
   border-radius: 24px; padding: 30px;
-  box-shadow: 0 8px 40px rgba(7,94,84,0.14);
-  text-align: center; color: #075e54;
+  /* Change: Shadow Blueish kar diya */
+  box-shadow: 0 8px 40px rgba(13, 71, 161, 0.15);
+  /* Change: Text Color Green se Royal Blue */
+  text-align: center; color: #0d47a1;
   display: flex; flex-direction: column; justify-content: center;
 }
 h2 { font-size: 2em; margin-bottom: 20px; }
@@ -24,11 +27,15 @@ h2 { font-size: 2em; margin-bottom: 20px; }
   border: 1px solid #ccc; outline: none; font-size: 16px; background: #fff;
 }
 button {
-  width: 100%; background: #25d366; border: none;
+  width: 100%; 
+  /* Change: Main Button Bright Blue */
+  background: #2196f3; 
+  border: none;
   padding: 14px; border-radius: 8px; color: #fff;
   cursor: pointer; margin-bottom: 10px; font-weight: bold; font-size: 16px;
 }
-.signup-btn { background: #075e54; }
+/* Change: Signup Button Dark Blue */
+.signup-btn { background: #0d47a1; }
 #auth-error-msg { color: #d32f2f; font-size: 14px; margin-top: 5px; display: none; }
 
 /* --- SCREENS --- */
@@ -41,7 +48,9 @@ button {
 
 /* --- HEADERS --- */
 .users-header, .chat-header {
-  background: #075e54; color: white; padding: 15px;
+  /* Change: Header Dark Blue */
+  background: #0d47a1; 
+  color: white; padding: 15px;
   font-size: 18px; font-weight: bold;
   display: flex; justify-content: space-between; align-items: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -72,18 +81,23 @@ button {
   display: flex; justify-content: center; align-items: center;
   margin-right: 15px; font-weight: bold; color: #555; font-size: 18px;
 }
-.group-avatar { background: #25d366; color: white; }
+/* Change: Group Icon Blue */
+.group-avatar { background: #2196f3; color: white; }
 .user-info-name { font-weight: bold; font-size: 16px; color: #333; }
 .user-info-email { font-size: 12px; color: #888; }
 
 /* --- REQUEST CARD --- */
 .req-card {
-  background: #e8f5e9; padding: 10px; margin-top: 10px;
-  border-radius: 8px; border: 1px solid #c8e6c9; text-align: left;
+  /* Change: Request Card Light Blueish */
+  background: #e3f2fd; 
+  padding: 10px; margin-top: 10px;
+  /* Change: Border Light Blue */
+  border-radius: 8px; border: 1px solid #90caf9; text-align: left;
 }
 .req-actions { display: flex; gap: 10px; margin-top: 8px; }
 .req-btn { padding: 6px 10px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; color: white; flex: 1; font-weight: bold; }
-.accept-btn { background: #25d366; }
+/* Change: Accept Button Blue */
+.accept-btn { background: #2196f3; }
 .reject-btn { background: #ff4444; }
 
 /* --- COPY UID BOX --- */
@@ -93,13 +107,17 @@ button {
   border: 1px dashed #999; font-family: monospace;
 }
 .copy-btn {
-  background: #075e54; padding: 6px 12px; font-size: 12px;
+  /* Change: Copy Button Dark Blue */
+  background: #0d47a1; 
+  padding: 6px 12px; font-size: 12px;
   margin-top: 5px; color: white; border: none; border-radius: 4px; cursor: pointer;
 }
 
 /* --- CHAT AREA --- */
 .chat-box {
-  flex-grow: 1; padding: 15px; background: #e5ddd5;
+  flex-grow: 1; padding: 15px; 
+  /* Change: Chat Background Cool Grey */
+  background: #eceff1;
   overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
 }
 .chat-input-area {
@@ -117,7 +135,8 @@ button {
   padding: 8px 12px; border-radius: 8px; margin: 2px 0;
   max-width: 75%; word-wrap: break-word; position: relative;
 }
-.my-message { background: #dcf8c6; align-self: flex-end; text-align: right; }
+/* Change: My Message Bubble Light Blue */
+.my-message { background: #bbdefb; align-self: flex-end; text-align: right; }
 .other-message { background: #fff; align-self: flex-start; text-align: left; }
 .sender-name { font-size: 10px; font-weight: bold; color: #d9534f; display: block; margin-bottom: 2px;}
 .msg-img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; }
@@ -141,4 +160,4 @@ button {
 #toast-box.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
 @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-  
+
