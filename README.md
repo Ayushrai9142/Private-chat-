@@ -1,48 +1,60 @@
-# 🔒 Private Chat App (Secure & Real-Time)
+# 🔒 Private Chat App (PWA)
 
-A secure, real-time messaging web application built with **Vanilla JavaScript** and **Firebase**. 
-It features a beautiful **Milky White Glassmorphism UI** and focuses on privacy by using unique User IDs instead of phone numbers.
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square&logo=javascript)
+![Firebase](https://img.shields.io/badge/Firebase-Backend-orange?style=flat-square&logo=firebase)
+![PWA](https://img.shields.io/badge/PWA-Ready-purple?style=flat-square&logo=pwa)
+![License](https://img.shields.io/github/license/YOUR_USERNAME/YOUR_REPO_NAME?style=flat-square&color=blue)
 
-## 🚀 Features
+> A secure, real-time messaging Progressive Web App built focusing on privacy. Features Global Chat, Private Messaging via Unique IDs, and a beautiful Milky White Glassmorphism UI.
 
-- **🌍 Global Group Chat:** Talk with everyone in the main lounge.
-- **🛡️ Private 1-on-1 Chat:** Secure messaging via Friend Request system.
-- **🆔 Unique ID System:** Add friends using unique UIDs (No phone numbers required).
-- **📷 Media Sharing:** Send images up to 100KB.
-- **🗑️ Advanced Delete:** - *Delete for Everyone* (Your messages).
-  - *Delete for Me* (Others' messages).
-- **🎨 Glassmorphism Design:** Modern, clean, and responsive UI.
-- **📱 PWA Support:** Installable on Android/iOS as a native app.
-- **🔒 Secure:** Firebase Authentication & Realtime Database Rules.
+---
+
+### 🔴 [**View Live Demo**](https://yourname.github.io/your-repo-name/)
+
+---
+
+## 📸 Screenshots
+
+| Login Screen | Global Chat | Profile & Add Friend |
+| :---: | :---: | :---: |
+| <img src="https://via.placeholder.com/250x500?text=Login+Screen" alt="Login Screen" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Global+Chat" alt="Global Chat" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Profile+Screen" alt="Profile Screen" width="200"/> |
+
+> *Note: Replace the placeholder images above with actual screenshots of your app (e.g., `screenshots/login.png`).*
+
+## 🚀 Key Features
+
+* **🌍 Global Group Chat:** Instantly connect with everyone in the main lounge.
+* **🛡️ Private 1-on-1 Chat:** Secure messaging via a Friend Request system. No strangers.
+* **🆔 Unique ID System:** Privacy-first approach. Add friends using unique UIDs instead of phone numbers.
+* **📱 PWA Support:** Installable on Android/iOS home screen just like a native app.
+* **🗑️ Advanced Delete:**
+    * *Delete for Everyone* (For your own messages).
+    * *Delete for Me* (Locally hide others' messages).
+* **📷 Media Sharing:** Send compressed images securely.
+* **🎨 Modern UI:** Clean Glassmorphism design with responsive layout.
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** HTML5, CSS3, JavaScript (ES6 Modules)
-- **Backend:** Firebase (Authentication, Realtime Database)
-- **Deployment:** GitHub Pages / Firebase Hosting
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6 Modules)
+* **Backend / Database:** Firebase Authentication & Realtime Database
+* **Hosting:** GitHub Pages / Firebase Hosting
 
 ## 📖 How to Use
 
-1. **Sign Up/Login:** Create an account using Email & Password.
-2. **Global Chat:** By default, you join the Global Chat.
-3. **Add a Friend:**
-   - Go to **Profile** → Click **Copy ID**.
-   - Share this ID with your friend.
-   - Your friend clicks **"➕ Add"** → Pastes ID → Sends Request.
-   - You accept the request in the **Add** menu.
-4. **Start Chatting:** Click on the friend's name to start a private conversation.
+1.  **Sign Up:** Create an account.
+2.  **Global Chat:** You are automatically added to the global lounge.
+3.  **Add a Private Friend:**
+    * Go to **Profile** → Click **Copy ID**.
+    * Send this ID to your friend.
+    * Your friend clicks **"➕ Add"** → Pastes the ID → Sends Request.
+    * Once accepted, you both appear in each other's contact list.
+4.  **Chat:** Click a name to start chatting privately!
 
-## ⚙️ Setup (For Developers)
+## 📄 License
 
-If you want to run this locally:
-
-1. Clone the repository.
-2. Create a project on [Firebase Console](https://console.firebase.google.com/).
-3. Enable **Authentication** (Email/Password) and **Realtime Database**.
-4. Copy your Firebase Config keys and replace them in `script.js`.
-5. Set Database Rules to `auth != null`.
-6. Open `index.html` in your browser!
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 **Made with ❤️ by Ayush**
+
