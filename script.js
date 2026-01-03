@@ -1,9 +1,8 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove, set, onValue, off, update, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// --- CONFIG ---
+// --- CONFIG (Same as before) ---
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
  authDomain: "private-chat-5c4c9.firebaseapp.com",
@@ -18,12 +17,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// Screens
+// Screens & Elements
 const loginContainer = document.getElementById("login-container");
 const usersScreen = document.getElementById("users-screen");
 const chatScreen = document.getElementById("chat-screen");
-
-// Elements
 const usersListEl = document.getElementById("users-list");
 const chatBox = document.getElementById("chat-box");
 const chatUserName = document.getElementById("chat-user-name");
@@ -47,6 +44,7 @@ const requestsList = document.getElementById("requests-list");
 let currentUser = null;
 let currentChatRoomId = null; 
 let modalCallback = null;
+let friendRequestRef = null; // NEW: To track the listener
 
 // Helpers
 function showToast(text) {
@@ -60,7 +58,7 @@ function showAuthError(msg) {
     setTimeout(() => { authErrorMsg.style.display = "none"; }, 4000);
 }
 
-// MODAL FUNCTION (Handles all popups)
+// --- MODAL SYSTEM (Fixed) ---
 function showModal(title, type, callback) {
     modalTitle.innerText = title;
     modal.style.display = "flex";
@@ -71,15 +69,17 @@ function showModal(title, type, callback) {
     profileSection.style.display = "none";
     requestsSection.style.display = "none";
     modalConfirm.style.display = "inline-block";
+    modalConfirm.innerText = "OK"; 
+
+    // Stop previous listeners if any
+    stopRequestListening();
 
     if (type === "input") {
-        // Simple confirmation or input
         modalInput.style.display = "block";
         modalInput.value = "";
         modalInput.focus();
     } 
     else if (type === "profile") {
-        // Profile View (Copy ID + Change Name)
         profileSection.style.display = "block";
         myUidText.innerText = currentUser.uid;
         modalInput.style.display = "block"; 
@@ -87,23 +87,33 @@ function showModal(title, type, callback) {
         modalInput.placeholder = "Change Name";
     }
     else if (type === "add_friend") {
-        // Add Friend View (Input + Request List)
         modalInput.style.display = "block";
         modalInput.placeholder = "Paste User ID here";
         requestsSection.style.display = "block";
-        loadFriendRequests();
+        loadFriendRequests(); // Start Listening
     }
     else {
-        // Just Confirmation (Delete)
         modalConfirm.innerText = "Yes";
     }
 }
 
-modalCancel.addEventListener("click", () => { modal.style.display = "none"; modalCallback = null; });
+function stopRequestListening() {
+    if (friendRequestRef) {
+        off(friendRequestRef); // Stop receiving updates
+        friendRequestRef = null;
+    }
+}
+
+modalCancel.addEventListener("click", () => { 
+    modal.style.display = "none"; 
+    modalCallback = null; 
+    stopRequestListening(); // Important
+});
+
 modalConfirm.addEventListener("click", () => { 
     if (modalCallback) modalCallback(modalInput.value); 
     modal.style.display = "none"; 
-    modalConfirm.innerText = "OK"; // Reset text
+    stopRequestListening(); // Important
 });
 
 // --- AUTH ---
@@ -139,7 +149,7 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// --- PROFILE & COPY ID ---
+// --- PROFILE ---
 document.getElementById("profile-btn").addEventListener("click", () => {
     showModal("Your Profile", "profile", (newName) => {
         if (newName && newName.trim() !== "") {
@@ -155,7 +165,7 @@ copyUidBtn.addEventListener("click", () => {
     navigator.clipboard.writeText(currentUser.uid).then(() => showToast("ID Copied!"));
 });
 
-// --- FRIEND SYSTEM ---
+// --- FRIEND SYSTEM (Fixed Logic) ---
 document.getElementById("add-friend-btn").addEventListener("click", () => {
     showModal("Add Friend", "add_friend", (friendUid) => {
         if(friendUid && friendUid.trim() !== "") {
@@ -165,15 +175,22 @@ document.getElementById("add-friend-btn").addEventListener("click", () => {
 });
 
 function sendFriendRequest(targetUid) {
-    if (targetUid === currentUser.uid) return showToast("Can't add yourself!");
+    targetUid = targetUid.trim(); // Extra Safe Trim
+    
+    if (targetUid === currentUser.uid) {
+        showToast("Can't add yourself!");
+        return; 
+    }
     
     get(ref(db, 'users/' + targetUid)).then((snapshot) => {
         if (snapshot.exists()) {
             set(ref(db, 'friend_requests/' + targetUid + '/' + currentUser.uid), {
                 from: currentUser.uid,
-                name: currentUser.displayName || currentUser.email,
+                name: currentUser.displayName || currentUser.email.split('@')[0],
                 email: currentUser.email
-            }).then(() => showToast("Request Sent!"));
+            })
+            .then(() => showToast("Request Sent!"))
+            .catch((err) => showToast("Error sending request"));
         } else {
             showToast("User ID Invalid!");
         }
@@ -181,12 +198,17 @@ function sendFriendRequest(targetUid) {
 }
 
 function loadFriendRequests() {
-    const reqRef = ref(db, 'friend_requests/' + currentUser.uid);
-    onValue(reqRef, (snapshot) => {
+    if (!currentUser) return;
+    
+    // Save reference to turn it off later
+    friendRequestRef = ref(db, 'friend_requests/' + currentUser.uid);
+    
+    onValue(friendRequestRef, (snapshot) => {
         requestsList.innerHTML = "";
         const reqs = snapshot.val();
+        
         if (!reqs) {
-            requestsList.innerHTML = "<div style='color:#999; font-size:12px;'>No pending requests.</div>";
+            requestsList.innerHTML = "<div style='color:#777; font-size:12px; padding:10px;'>No pending requests.</div>";
             return;
         }
 
@@ -201,18 +223,23 @@ function loadFriendRequests() {
                 </div>
             `;
             
+            // Accept Logic
             div.querySelector(".accept-btn").addEventListener("click", () => {
-                // Add both ways
-                update(ref(db, 'friends/' + currentUser.uid + '/' + req.from), { added: true });
-                update(ref(db, 'friends/' + req.from + '/' + currentUser.uid), { added: true });
-                remove(ref(db, 'friend_requests/' + currentUser.uid + '/' + req.from));
-                showToast("Friend Added!");
-                loadFriendsList();
+                const updates = {};
+                updates['friends/' + currentUser.uid + '/' + req.from] = { added: true };
+                updates['friends/' + req.from + '/' + currentUser.uid] = { added: true };
+                updates['friend_requests/' + currentUser.uid + '/' + req.from] = null; // Delete request
+
+                update(ref(db), updates).then(() => {
+                    showToast("Friend Added!");
+                    // No need to reload, onValue updates automatically
+                });
             });
 
+            // Reject Logic
             div.querySelector(".reject-btn").addEventListener("click", () => {
-                remove(ref(db, 'friend_requests/' + currentUser.uid + '/' + req.from));
-                showToast("Rejected");
+                remove(ref(db, 'friend_requests/' + currentUser.uid + '/' + req.from))
+                .then(() => showToast("Rejected"));
             });
 
             requestsList.appendChild(div);
@@ -220,7 +247,7 @@ function loadFriendRequests() {
     });
 }
 
-// --- MAIN LIST (Global + Friends) ---
+// --- MAIN LIST ---
 function loadFriendsList() {
     const friendsRef = ref(db, 'friends/' + currentUser.uid);
     
@@ -350,4 +377,4 @@ imgInput.addEventListener("change", (e) => {
         reader.readAsDataURL(file);
     } else { showToast("File too big (>100KB)"); }
 });
-                           
+
