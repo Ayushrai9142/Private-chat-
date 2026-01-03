@@ -11,13 +11,12 @@ body, html {
 /* --- LOGIN CONTAINER --- */
 .container {
   width: 95%; max-width: 500px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.9); /* Milky White */
   border-radius: 24px; padding: 30px;
   box-shadow: 0 8px 40px rgba(7,94,84,0.14);
   text-align: center; color: #075e54;
   display: flex; flex-direction: column; justify-content: center;
 }
-
 h2 { font-size: 2em; margin-bottom: 20px; }
 .input-group { margin-bottom: 15px; width: 100%; }
 .input-group input {
@@ -32,7 +31,7 @@ button {
 .signup-btn { background: #075e54; }
 #auth-error-msg { color: #d32f2f; font-size: 14px; margin-top: 5px; display: none; }
 
-/* --- COMMON SCREEN STYLE --- */
+/* --- SCREENS --- */
 #users-screen, #chat-screen {
   display: none; background: #fff;
   width: 100%; height: 100%;
@@ -40,37 +39,23 @@ button {
   position: absolute; top: 0; left: 0;
 }
 
-/* --- HEADERS (Fixed Layout) --- */
+/* --- HEADERS --- */
 .users-header, .chat-header {
   background: #075e54; color: white; padding: 15px;
   font-size: 18px; font-weight: bold;
   display: flex; justify-content: space-between; align-items: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   flex-shrink: 0;
-  white-space: nowrap; /* Text ko tootne se rokega */
 }
-
-/* Header Content Alignment */
-.header-content {
-  display: flex; align-items: center;
-  overflow: hidden; /* Extra text hide */
-}
-
-/* Buttons inside Header */
 .header-btns { display: flex; gap: 8px; align-items: center; }
-
 .small-btn {
   background: rgba(255,255,255,0.2); border: none;
   padding: 6px 12px; color: white; border-radius: 6px;
   font-size: 13px; cursor: pointer; white-space: nowrap;
 }
-
-/* Back Button Fix (Chhota aur Clean) */
 .back-btn {
   background: none; border: none; color: white;
-  font-size: 22px; /* Thoda chhota kiya */
-  cursor: pointer; margin-right: 10px; padding: 0 5px;
-  display: flex; align-items: center;
+  font-size: 22px; cursor: pointer; margin-right: 10px; padding: 0 5px;
 }
 
 /* --- CONTACT LIST --- */
@@ -90,6 +75,27 @@ button {
 .group-avatar { background: #25d366; color: white; }
 .user-info-name { font-weight: bold; font-size: 16px; color: #333; }
 .user-info-email { font-size: 12px; color: #888; }
+
+/* --- REQUEST CARD --- */
+.req-card {
+  background: #e8f5e9; padding: 10px; margin-top: 10px;
+  border-radius: 8px; border: 1px solid #c8e6c9; text-align: left;
+}
+.req-actions { display: flex; gap: 10px; margin-top: 8px; }
+.req-btn { padding: 6px 10px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; color: white; flex: 1; font-weight: bold; }
+.accept-btn { background: #25d366; }
+.reject-btn { background: #ff4444; }
+
+/* --- COPY UID BOX --- */
+.uid-box {
+  background: #f5f5f5; padding: 10px; border-radius: 5px;
+  font-size: 13px; color: #333; margin: 10px 0; word-break: break-all;
+  border: 1px dashed #999; font-family: monospace;
+}
+.copy-btn {
+  background: #075e54; padding: 6px 12px; font-size: 12px;
+  margin-top: 5px; color: white; border: none; border-radius: 4px; cursor: pointer;
+}
 
 /* --- CHAT AREA --- */
 .chat-box {
@@ -113,7 +119,6 @@ button {
 }
 .my-message { background: #dcf8c6; align-self: flex-end; text-align: right; }
 .other-message { background: #fff; align-self: flex-start; text-align: left; }
-
 .sender-name { font-size: 10px; font-weight: bold; color: #d9534f; display: block; margin-bottom: 2px;}
 .msg-img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; }
 .msg-time { font-size: 9px; color: #777; display: block; margin-top: 2px; }
@@ -124,7 +129,7 @@ button {
   width: 100%; height: 100%; background: rgba(0,0,0,0.5);
   z-index: 200; justify-content: center; align-items: center;
 }
-.modal-content { background: white; padding: 25px; border-radius: 15px; width: 85%; max-width: 300px; text-align: center; }
+.modal-content { background: white; padding: 25px; border-radius: 15px; width: 85%; max-width: 320px; text-align: center; max-height: 80vh; overflow-y: auto; }
 #modal-input { width: 100%; padding: 10px; border: 1px solid #ccc; margin: 15px 0; display: none; }
 .modal-btn { width: auto; padding: 8px 20px; margin: 5px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
 
