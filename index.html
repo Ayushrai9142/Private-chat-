@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Private Chat</title>
+<title>Private & Group Chat</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -11,28 +11,29 @@
 
 <div class="container" id="login-container">
   <h2>Welcome Back</h2>
-  
-  <div class="input-group">
-    <input type="email" id="email" placeholder="Email" />
-  </div>
-  
-  <div class="input-group">
-    <input type="password" id="password" placeholder="Password" />
-  </div>
-
+  <div class="input-group"><input type="email" id="email" placeholder="Email" /></div>
+  <div class="input-group"><input type="password" id="password" placeholder="Password" /></div>
   <button id="login-btn">Login</button>
   <div style="margin:10px 0;">or</div>
   <button id="signup-btn" class="signup-btn">Sign Up</button>
-
   <div id="auth-error-msg"></div>
+</div>
+
+<div id="users-screen">
+  <div class="users-header">
+    <span>Contacts</span>
+    <button id="logout-btn" style="background:#ff4444; border:none; padding:5px 10px; color:white; border-radius:5px; cursor:pointer;">Logout</button>
+  </div>
+  <div class="users-list" id="users-list">
+    <div style="text-align:center; padding:20px; color:#888;">Loading...</div>
+  </div>
 </div>
 
 <div id="chat-screen">
   <div class="chat-header">
-    <span>Private Room</span>
-    <div class="header-actions">
-      <button id="profile-btn">Name</button>
-      <button id="logout-btn" style="background:#ff4444;">Logout</button>
+    <div style="display:flex; align-items:center;">
+      <button id="back-btn" class="back-btn">←</button>
+      <span id="chat-user-name">Chat</span>
     </div>
   </div>
   
@@ -41,7 +42,6 @@
   <div class="chat-input-area">
     <button class="icon-btn" id="upload-trigger">📷</button>
     <input type="file" id="image-input" accept="image/*" hidden>
-    
     <input type="text" id="message-input" placeholder="Type a message..." />
     <button class="icon-btn" id="send-msg-btn" style="color:#075e54;">➤</button>
   </div>
@@ -49,15 +49,14 @@
 
 <div id="custom-modal">
   <div class="modal-content">
-    <h3 id="modal-title" style="margin-bottom:10px;">Title</h3>
-    <input type="text" id="modal-input" placeholder="Enter here...">
+    <h3 id="modal-title">Title</h3>
+    <input type="text" id="modal-input">
     <div>
-      <button id="modal-cancel" class="modal-btn" style="background:#ff4444;">Cancel</button>
-      <button id="modal-confirm" class="modal-btn" style="background:#25d366;">OK</button>
+      <button id="modal-cancel" class="modal-btn" style="background:#ff4444; color:white; border:none;">Cancel</button>
+      <button id="modal-confirm" class="modal-btn" style="background:#25d366; color:white; border:none;">OK</button>
     </div>
   </div>
 </div>
-
 <div id="toast-box">Notification</div>
 
 <script>
