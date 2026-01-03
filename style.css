@@ -5,7 +5,7 @@ body, html {
   height: 100%; width: 100%;
   background: #e5ddd5;
   display: flex; justify-content: center; align-items: center;
-  overflow: hidden; /* Scroll bar hide */
+  overflow: hidden;
 }
 
 /* --- LOGIN CONTAINER --- */
@@ -32,30 +32,45 @@ button {
 .signup-btn { background: #075e54; }
 #auth-error-msg { color: #d32f2f; font-size: 14px; margin-top: 5px; display: none; }
 
-/* --- COMMON SCREEN STYLE (Users & Chat) --- */
+/* --- COMMON SCREEN STYLE --- */
 #users-screen, #chat-screen {
   display: none; background: #fff;
-  width: 100%; height: 100%; /* Full Mobile Height */
+  width: 100%; height: 100%;
   flex-direction: column; overflow: hidden;
   position: absolute; top: 0; left: 0;
 }
 
-/* --- HEADERS (Alignment Fix) --- */
+/* --- HEADERS (Fixed Layout) --- */
 .users-header, .chat-header {
   background: #075e54; color: white; padding: 15px;
   font-size: 18px; font-weight: bold;
   display: flex; justify-content: space-between; align-items: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   flex-shrink: 0;
+  white-space: nowrap; /* Text ko tootne se rokega */
 }
 
-/* Header Buttons Group */
+/* Header Content Alignment */
+.header-content {
+  display: flex; align-items: center;
+  overflow: hidden; /* Extra text hide */
+}
+
+/* Buttons inside Header */
 .header-btns { display: flex; gap: 8px; align-items: center; }
 
 .small-btn {
   background: rgba(255,255,255,0.2); border: none;
   padding: 6px 12px; color: white; border-radius: 6px;
   font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+
+/* Back Button Fix (Chhota aur Clean) */
+.back-btn {
+  background: none; border: none; color: white;
+  font-size: 22px; /* Thoda chhota kiya */
+  cursor: pointer; margin-right: 10px; padding: 0 5px;
+  display: flex; align-items: center;
 }
 
 /* --- CONTACT LIST --- */
@@ -68,7 +83,7 @@ button {
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 .user-avatar {
-  width: 45px; height: 45px; background: #ddd; border-radius: 50%;
+  min-width: 45px; height: 45px; background: #ddd; border-radius: 50%;
   display: flex; justify-content: center; align-items: center;
   margin-right: 15px; font-weight: bold; color: #555; font-size: 18px;
 }
