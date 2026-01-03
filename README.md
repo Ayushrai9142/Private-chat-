@@ -3,23 +3,14 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square&logo=javascript)
 ![Firebase](https://img.shields.io/badge/Firebase-Backend-orange?style=flat-square&logo=firebase)
 ![PWA](https://img.shields.io/badge/PWA-Ready-purple?style=flat-square&logo=pwa)
-![License](https://img.shields.io/github/license/ayushraistuio/private-chat?style=flat-square&color=blue)
 
 > A secure, real-time messaging Progressive Web App built focusing on privacy. Features Global Chat, Private Messaging via Unique IDs, and a beautiful Milky White Glassmorphism UI.
 
 ---
 
-### 🔴 [**View Live Demo**](https://yourname.github.io/your-repo-name/)
+### 🔴 **[Click Here to Open App](https://ayushraistudio.github.io/private-chat/)**
 
 ---
-
-## 📸 Screenshots
-
-| Login Screen | Global Chat | Profile & Add Friend |
-| :---: | :---: | :---: |
-| <img src="https://via.placeholder.com/250x500?text=Login+Screen" alt="Login Screen" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Global+Chat" alt="Global Chat" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Profile+Screen" alt="Profile Screen" width="200"/> |
-
-> *Note: Replace the placeholder images above with actual screenshots of your app (e.g., `screenshots/login.png`).*
 
 ## 🚀 Key Features
 
@@ -52,9 +43,9 @@
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**.
 
 ---
 
-**Made with ❤️ by Ayush**
+**Made with ❤️ by Ayush Rai**
 
