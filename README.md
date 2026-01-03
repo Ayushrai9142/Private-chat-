@@ -19,7 +19,7 @@
 | :---: | :---: | :---: |
 | <img src="https://via.placeholder.com/250x500?text=Login+Screen" alt="Login Screen" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Global+Chat" alt="Global Chat" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Profile+Screen" alt="Profile Screen" width="200"/> |
 
-> *Note: Replace the placeholder images above with actual screenshots of your app (e.g., `screenshots/login.png`).*
+
 
 ## 🚀 Key Features
 
