@@ -1,8 +1,9 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove, set, onValue, off, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove, set, onValue, off, update, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// --- FIREBASE CONFIG ---
+// --- CONFIG ---
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
  authDomain: "private-chat-5c4c9.firebaseapp.com",
@@ -31,12 +32,17 @@ const imgInput = document.getElementById("image-input");
 const authErrorMsg = document.getElementById("auth-error-msg");
 const toastBox = document.getElementById("toast-box");
 
-// Modal
+// Modal Elements
 const modal = document.getElementById("custom-modal");
 const modalTitle = document.getElementById("modal-title");
 const modalInput = document.getElementById("modal-input");
 const modalConfirm = document.getElementById("modal-confirm");
 const modalCancel = document.getElementById("modal-cancel");
+const profileSection = document.getElementById("profile-section");
+const myUidText = document.getElementById("my-uid-text");
+const copyUidBtn = document.getElementById("copy-uid-btn");
+const requestsSection = document.getElementById("requests-section");
+const requestsList = document.getElementById("requests-list");
 
 let currentUser = null;
 let currentChatRoomId = null; 
@@ -53,20 +59,57 @@ function showAuthError(msg) {
     authErrorMsg.style.display = "block";
     setTimeout(() => { authErrorMsg.style.display = "none"; }, 4000);
 }
-function showModal(title, needsInput, callback) {
+
+// MODAL FUNCTION (Handles all popups)
+function showModal(title, type, callback) {
     modalTitle.innerText = title;
     modal.style.display = "flex";
     modalCallback = callback;
-    if (needsInput) { modalInput.style.display = "block"; modalInput.value = ""; modalInput.focus(); }
-    else { modalInput.style.display = "none"; }
+    
+    // Reset Views
+    modalInput.style.display = "none";
+    profileSection.style.display = "none";
+    requestsSection.style.display = "none";
+    modalConfirm.style.display = "inline-block";
+
+    if (type === "input") {
+        // Simple confirmation or input
+        modalInput.style.display = "block";
+        modalInput.value = "";
+        modalInput.focus();
+    } 
+    else if (type === "profile") {
+        // Profile View (Copy ID + Change Name)
+        profileSection.style.display = "block";
+        myUidText.innerText = currentUser.uid;
+        modalInput.style.display = "block"; 
+        modalInput.value = currentUser.displayName || "";
+        modalInput.placeholder = "Change Name";
+    }
+    else if (type === "add_friend") {
+        // Add Friend View (Input + Request List)
+        modalInput.style.display = "block";
+        modalInput.placeholder = "Paste User ID here";
+        requestsSection.style.display = "block";
+        loadFriendRequests();
+    }
+    else {
+        // Just Confirmation (Delete)
+        modalConfirm.innerText = "Yes";
+    }
 }
+
 modalCancel.addEventListener("click", () => { modal.style.display = "none"; modalCallback = null; });
-modalConfirm.addEventListener("click", () => { if (modalCallback) modalCallback(modalInput.value); modal.style.display = "none"; });
+modalConfirm.addEventListener("click", () => { 
+    if (modalCallback) modalCallback(modalInput.value); 
+    modal.style.display = "none"; 
+    modalConfirm.innerText = "OK"; // Reset text
+});
 
 // --- AUTH ---
 function writeUserData(user) {
     const name = user.displayName || user.email.split('@')[0];
-    set(ref(db, 'users/' + user.uid), { email: user.email, name: name, uid: user.uid });
+    update(ref(db, 'users/' + user.uid), { email: user.email, name: name, uid: user.uid });
 }
 
 document.getElementById("login-btn").addEventListener("click", () => {
@@ -82,27 +125,13 @@ document.getElementById("signup-btn").addEventListener("click", () => {
 
 document.getElementById("logout-btn").addEventListener("click", () => signOut(auth).then(() => location.reload()));
 
-// --- PROFILE CHANGE (Fixed) ---
-document.getElementById("profile-btn").addEventListener("click", () => {
-    showModal("Change Your Name", true, (newName) => {
-        if (newName && newName.trim() !== "") {
-            updateProfile(currentUser, { displayName: newName })
-            .then(() => {
-                // Update in DB too
-                update(ref(db, 'users/' + currentUser.uid), { name: newName });
-                showToast("Name Updated!");
-            });
-        }
-    });
-});
-
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
         writeUserData(user);
         loginContainer.style.display = "none";
         usersScreen.style.display = "flex";
-        loadUserList();
+        loadFriendsList();
     } else {
         loginContainer.style.display = "flex";
         usersScreen.style.display = "none";
@@ -110,13 +139,95 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// --- LIST LOGIC ---
-function loadUserList() {
-    const usersRef = ref(db, 'users');
-    onValue(usersRef, (snapshot) => {
+// --- PROFILE & COPY ID ---
+document.getElementById("profile-btn").addEventListener("click", () => {
+    showModal("Your Profile", "profile", (newName) => {
+        if (newName && newName.trim() !== "") {
+            updateProfile(currentUser, { displayName: newName }).then(() => {
+                update(ref(db, 'users/' + currentUser.uid), { name: newName });
+                showToast("Name Updated!");
+            });
+        }
+    });
+});
+
+copyUidBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(currentUser.uid).then(() => showToast("ID Copied!"));
+});
+
+// --- FRIEND SYSTEM ---
+document.getElementById("add-friend-btn").addEventListener("click", () => {
+    showModal("Add Friend", "add_friend", (friendUid) => {
+        if(friendUid && friendUid.trim() !== "") {
+            sendFriendRequest(friendUid.trim());
+        }
+    });
+});
+
+function sendFriendRequest(targetUid) {
+    if (targetUid === currentUser.uid) return showToast("Can't add yourself!");
+    
+    get(ref(db, 'users/' + targetUid)).then((snapshot) => {
+        if (snapshot.exists()) {
+            set(ref(db, 'friend_requests/' + targetUid + '/' + currentUser.uid), {
+                from: currentUser.uid,
+                name: currentUser.displayName || currentUser.email,
+                email: currentUser.email
+            }).then(() => showToast("Request Sent!"));
+        } else {
+            showToast("User ID Invalid!");
+        }
+    });
+}
+
+function loadFriendRequests() {
+    const reqRef = ref(db, 'friend_requests/' + currentUser.uid);
+    onValue(reqRef, (snapshot) => {
+        requestsList.innerHTML = "";
+        const reqs = snapshot.val();
+        if (!reqs) {
+            requestsList.innerHTML = "<div style='color:#999; font-size:12px;'>No pending requests.</div>";
+            return;
+        }
+
+        Object.values(reqs).forEach(req => {
+            const div = document.createElement("div");
+            div.className = "req-card";
+            div.innerHTML = `
+                <div><strong>${req.name}</strong> wants to connect.</div>
+                <div class="req-actions">
+                    <button class="req-btn accept-btn">Accept</button>
+                    <button class="req-btn reject-btn">Reject</button>
+                </div>
+            `;
+            
+            div.querySelector(".accept-btn").addEventListener("click", () => {
+                // Add both ways
+                update(ref(db, 'friends/' + currentUser.uid + '/' + req.from), { added: true });
+                update(ref(db, 'friends/' + req.from + '/' + currentUser.uid), { added: true });
+                remove(ref(db, 'friend_requests/' + currentUser.uid + '/' + req.from));
+                showToast("Friend Added!");
+                loadFriendsList();
+            });
+
+            div.querySelector(".reject-btn").addEventListener("click", () => {
+                remove(ref(db, 'friend_requests/' + currentUser.uid + '/' + req.from));
+                showToast("Rejected");
+            });
+
+            requestsList.appendChild(div);
+        });
+    });
+}
+
+// --- MAIN LIST (Global + Friends) ---
+function loadFriendsList() {
+    const friendsRef = ref(db, 'friends/' + currentUser.uid);
+    
+    onValue(friendsRef, (snapshot) => {
         usersListEl.innerHTML = "";
         
-        // Group Option
+        // 1. Global Group
         const groupDiv = document.createElement("div");
         groupDiv.className = "user-card";
         groupDiv.innerHTML = `
@@ -126,25 +237,28 @@ function loadUserList() {
         groupDiv.addEventListener("click", () => openChat(null, true));
         usersListEl.appendChild(groupDiv);
 
-        // Private Users
-        const users = snapshot.val();
-        if (!users) return;
-        Object.values(users).forEach(user => {
-            if (user.uid === currentUser.uid) return; 
+        // 2. Friends
+        const friends = snapshot.val();
+        if (!friends) return;
 
-            const div = document.createElement("div");
-            div.className = "user-card";
-            div.innerHTML = `
-                <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                <div><div class="user-info-name">${user.name}</div><div class="user-info-email">${user.email}</div></div>
-            `;
-            div.addEventListener("click", () => openChat(user, false));
-            usersListEl.appendChild(div);
+        Object.keys(friends).forEach(friendUid => {
+            get(ref(db, 'users/' + friendUid)).then((userSnap) => {
+                const user = userSnap.val();
+                if(!user) return;
+                const div = document.createElement("div");
+                div.className = "user-card";
+                div.innerHTML = `
+                    <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                    <div><div class="user-info-name">${user.name}</div><div class="user-info-email">${user.email}</div></div>
+                `;
+                div.addEventListener("click", () => openChat(user, false));
+                usersListEl.appendChild(div);
+            });
         });
     });
 }
 
-// --- OPEN CHAT ---
+// --- CHAT LOGIC ---
 function openChat(targetUser, isGroup) {
     if (isGroup) {
         currentChatRoomId = "global_group_chat";
@@ -166,11 +280,9 @@ document.getElementById("back-btn").addEventListener("click", () => {
     currentChatRoomId = null;
 });
 
-// --- MESSAGES LOGIC ---
 function loadMessages() {
     chatBox.innerHTML = "";
     if (!currentChatRoomId) return;
-
     const roomRef = ref(db, "messages/" + currentChatRoomId);
     onChildAdded(roomRef, (s) => displayMessage(s.val(), s.key));
     onChildRemoved(roomRef, (s) => {
@@ -182,7 +294,6 @@ function loadMessages() {
 function sendMessage(text = "", imageUrl = null) {
     if ((!text && !imageUrl) || !currentChatRoomId) return;
     const name = currentUser.displayName || currentUser.email.split('@')[0];
-    
     push(ref(db, "messages/" + currentChatRoomId), {
         text: text, imageUrl: imageUrl, sender: currentUser.email, senderName: name, timestamp: Date.now()
     });
@@ -190,7 +301,6 @@ function sendMessage(text = "", imageUrl = null) {
 }
 
 function displayMessage(data, key) {
-    // 1. CHECK IF DELETED FOR ME (Local Storage)
     if (localStorage.getItem("hidden_" + key)) return;
 
     const div = document.createElement("div");
@@ -209,20 +319,17 @@ function displayMessage(data, key) {
     
     div.innerHTML = html;
 
-    // --- DELETE LOGIC ---
     div.addEventListener("click", () => {
         if (isMe) {
-            // MY MESSAGE: Delete for Everyone (Firebase)
-            showModal("Delete for Everyone?", false, () => {
+            showModal("Delete for Everyone?", null, () => {
                 remove(ref(db, "messages/" + currentChatRoomId + "/" + key));
-                showToast("Deleted for Everyone");
+                showToast("Deleted");
             });
         } else {
-            // OTHER'S MESSAGE: Delete for Me (Local Storage)
-            showModal("Delete for Me?", false, () => {
-                localStorage.setItem("hidden_" + key, "true"); // Save ID locally
-                div.remove(); // Remove from screen
-                showToast("Deleted for Me");
+            showModal("Delete for Me?", null, () => {
+                localStorage.setItem("hidden_" + key, "true");
+                div.remove();
+                showToast("Hidden");
             });
         }
     });
@@ -231,7 +338,7 @@ function displayMessage(data, key) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Input Handlers
+// Inputs
 document.getElementById("send-msg-btn").addEventListener("click", () => sendMessage(msgInput.value.trim()));
 msgInput.addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(msgInput.value.trim()); });
 document.getElementById("upload-trigger").addEventListener("click", () => imgInput.click());
@@ -243,4 +350,4 @@ imgInput.addEventListener("change", (e) => {
         reader.readAsDataURL(file);
     } else { showToast("File too big (>100KB)"); }
 });
-     
+                           
