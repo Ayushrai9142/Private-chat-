@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove, set, onValue, off } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, onChildRemoved, remove, set, onValue, off, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// --- CONFIG ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
  apiKey: "AIzaSyBiXDDBTUvgeT99KVTiz9Q-VXtklqBLbwA",
  authDomain: "private-chat-5c4c9.firebaseapp.com",
@@ -31,7 +31,7 @@ const imgInput = document.getElementById("image-input");
 const authErrorMsg = document.getElementById("auth-error-msg");
 const toastBox = document.getElementById("toast-box");
 
-// Modal Elements
+// Modal
 const modal = document.getElementById("custom-modal");
 const modalTitle = document.getElementById("modal-title");
 const modalInput = document.getElementById("modal-input");
@@ -63,9 +63,9 @@ function showModal(title, needsInput, callback) {
 modalCancel.addEventListener("click", () => { modal.style.display = "none"; modalCallback = null; });
 modalConfirm.addEventListener("click", () => { if (modalCallback) modalCallback(modalInput.value); modal.style.display = "none"; });
 
-// Auth
+// --- AUTH ---
 function writeUserData(user) {
-    const name = user.email.split('@')[0];
+    const name = user.displayName || user.email.split('@')[0];
     set(ref(db, 'users/' + user.uid), { email: user.email, name: name, uid: user.uid });
 }
 
@@ -82,6 +82,20 @@ document.getElementById("signup-btn").addEventListener("click", () => {
 
 document.getElementById("logout-btn").addEventListener("click", () => signOut(auth).then(() => location.reload()));
 
+// --- PROFILE CHANGE (Fixed) ---
+document.getElementById("profile-btn").addEventListener("click", () => {
+    showModal("Change Your Name", true, (newName) => {
+        if (newName && newName.trim() !== "") {
+            updateProfile(currentUser, { displayName: newName })
+            .then(() => {
+                // Update in DB too
+                update(ref(db, 'users/' + currentUser.uid), { name: newName });
+                showToast("Name Updated!");
+            });
+        }
+    });
+});
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
@@ -96,41 +110,35 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// --- LIST LOGIC (GROUP + USERS) ---
+// --- LIST LOGIC ---
 function loadUserList() {
     const usersRef = ref(db, 'users');
     onValue(usersRef, (snapshot) => {
         usersListEl.innerHTML = "";
         
-        // 1. ADD GROUP CHAT OPTION (Top pe)
+        // Group Option
         const groupDiv = document.createElement("div");
         groupDiv.className = "user-card";
         groupDiv.innerHTML = `
             <div class="user-avatar group-avatar">🌍</div>
-            <div>
-                <div class="user-info-name">Global Group Chat</div>
-                <div class="user-info-email">Talk with everyone</div>
-            </div>
+            <div><div class="user-info-name">Global Chat</div><div class="user-info-email">Everyone</div></div>
         `;
-        groupDiv.addEventListener("click", () => openChat(null, true)); // True means Group
+        groupDiv.addEventListener("click", () => openChat(null, true));
         usersListEl.appendChild(groupDiv);
 
-        // 2. ADD PRIVATE USERS
+        // Private Users
         const users = snapshot.val();
         if (!users) return;
         Object.values(users).forEach(user => {
-            if (user.uid === currentUser.uid) return; // Hide self
+            if (user.uid === currentUser.uid) return; 
 
             const div = document.createElement("div");
             div.className = "user-card";
             div.innerHTML = `
                 <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                <div>
-                    <div class="user-info-name">${user.name}</div>
-                    <div class="user-info-email">${user.email}</div>
-                </div>
+                <div><div class="user-info-name">${user.name}</div><div class="user-info-email">${user.email}</div></div>
             `;
-            div.addEventListener("click", () => openChat(user, false)); // False means Private
+            div.addEventListener("click", () => openChat(user, false));
             usersListEl.appendChild(div);
         });
     });
@@ -140,14 +148,12 @@ function loadUserList() {
 function openChat(targetUser, isGroup) {
     if (isGroup) {
         currentChatRoomId = "global_group_chat";
-        chatUserName.innerText = "🌍 Global Group";
+        chatUserName.innerText = "Global Chat";
     } else {
         chatUserName.innerText = targetUser.name;
-        // Private ID logic
         const ids = [currentUser.uid, targetUser.uid].sort();
         currentChatRoomId = ids[0] + "_" + ids[1];
     }
-
     usersScreen.style.display = "none";
     chatScreen.style.display = "flex";
     loadMessages();
@@ -160,7 +166,7 @@ document.getElementById("back-btn").addEventListener("click", () => {
     currentChatRoomId = null;
 });
 
-// --- MESSAGES ---
+// --- MESSAGES LOGIC ---
 function loadMessages() {
     chatBox.innerHTML = "";
     if (!currentChatRoomId) return;
@@ -175,7 +181,7 @@ function loadMessages() {
 
 function sendMessage(text = "", imageUrl = null) {
     if ((!text && !imageUrl) || !currentChatRoomId) return;
-    const name = currentUser.email.split('@')[0];
+    const name = currentUser.displayName || currentUser.email.split('@')[0];
     
     push(ref(db, "messages/" + currentChatRoomId), {
         text: text, imageUrl: imageUrl, sender: currentUser.email, senderName: name, timestamp: Date.now()
@@ -184,11 +190,13 @@ function sendMessage(text = "", imageUrl = null) {
 }
 
 function displayMessage(data, key) {
+    // 1. CHECK IF DELETED FOR ME (Local Storage)
+    if (localStorage.getItem("hidden_" + key)) return;
+
     const div = document.createElement("div");
     div.classList.add("message");
     div.id = key;
     
-    // Check if message is mine
     const isMe = data.sender === currentUser.email;
     div.classList.add(isMe ? "my-message" : "other-message");
 
@@ -201,14 +209,23 @@ function displayMessage(data, key) {
     
     div.innerHTML = html;
 
-    if (isMe) {
-        div.addEventListener("click", () => {
-            showModal("Delete Message?", false, () => {
+    // --- DELETE LOGIC ---
+    div.addEventListener("click", () => {
+        if (isMe) {
+            // MY MESSAGE: Delete for Everyone (Firebase)
+            showModal("Delete for Everyone?", false, () => {
                 remove(ref(db, "messages/" + currentChatRoomId + "/" + key));
-                showToast("Deleted");
+                showToast("Deleted for Everyone");
             });
-        });
-    }
+        } else {
+            // OTHER'S MESSAGE: Delete for Me (Local Storage)
+            showModal("Delete for Me?", false, () => {
+                localStorage.setItem("hidden_" + key, "true"); // Save ID locally
+                div.remove(); // Remove from screen
+                showToast("Deleted for Me");
+            });
+        }
+    });
 
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -226,4 +243,4 @@ imgInput.addEventListener("change", (e) => {
         reader.readAsDataURL(file);
     } else { showToast("File too big (>100KB)"); }
 });
-             
+     
