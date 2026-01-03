@@ -9,7 +9,7 @@
 
 ---
 
-### 🔴 [**View Live Demo**](https://ayushraistudio.github.io/private-chat/)
+### 🔴 [**View Live Demo**](https://ayushraistudio.github.io/Private-chat/)
 
 ---
 
