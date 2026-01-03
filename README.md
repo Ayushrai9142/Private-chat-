@@ -19,7 +19,6 @@
 | :---: | :---: | :---: |
 | <img src="screenshots/login.png" alt="Login Screen" width="200"/> | <img src="screenshots/global-chat.png" alt="Global Chat" width="200"/> | <img src="screenshots/profile.png" alt="Profile Screen" width="200"/> |
 
-> *Note: Ensure you have a folder named `screenshots` containing `login.png`, `global-chat.png`, and `profile.png`.*
 
 ## 🚀 Key Features
 
