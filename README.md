@@ -17,9 +17,9 @@
 
 | Login Screen | Global Chat | Profile & Add Friend |
 | :---: | :---: | :---: |
-| <img src="https://via.placeholder.com/250x500?text=Login+Screen" alt="Login Screen" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Global+Chat" alt="Global Chat" width="200"/> | <img src="https://via.placeholder.com/250x500?text=Profile+Screen" alt="Profile Screen" width="200"/> |
+| <img src="screenshots/login.png" alt="Login Screen" width="200"/> | <img src="screenshots/global-chat.png" alt="Global Chat" width="200"/> | <img src="screenshots/profile.png" alt="Profile Screen" width="200"/> |
 
-
+> *Note: Ensure you have a folder named `screenshots` containing `login.png`, `global-chat.png`, and `profile.png`.*
 
 ## 🚀 Key Features
 
@@ -57,3 +57,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ---
 
 **Made with ❤️ by Ayush Rai**
+
