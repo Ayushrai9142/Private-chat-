@@ -7,6 +7,7 @@
 
 > A secure, real-time messaging Progressive Web App built focusing on privacy. Features Global Chat, Private Messaging via Unique IDs, and a beautiful Milky White Glassmorphism UI.
 
+
 ---
 
 ### 🔴 [**View Live Demo**](https://ayushraistudio.github.io/Private-chat/)
